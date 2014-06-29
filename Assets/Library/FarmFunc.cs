@@ -33,7 +33,7 @@ public struct Gene{
 
 public class FarmFunc : MonoBehaviour {
 	
-	public GameObject objRabbit;
+	public static readonly ulong carrotSeeDistance = 200;
 
 	// Use this for initialization
 	void Start () {
@@ -55,6 +55,7 @@ public class FarmFunc : MonoBehaviour {
 		}
 		return result;
 	}
+	
 	public static Rabbit findAnotherRabbit(Rabbit target){
 		Rabbit result = null;
 		RaycastHit2D[] hit;
@@ -68,6 +69,7 @@ public class FarmFunc : MonoBehaviour {
 		}
 		return result;
 	}
+	
 	public static Rabbit createRabbit(Rabbit father, Rabbit mother){
 		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
@@ -86,10 +88,22 @@ public class FarmFunc : MonoBehaviour {
 		}
 		return newRabbit.GetComponent<Rabbit>();
 	}
+	
 	public static Carrot createCarrot(float x, float y){
 		Vector3 tempPosition = Camera.main.ScreenToWorldPoint(new Vector3(x, y, 0));
 		tempPosition.z = 0;
 		GameObject newCarrot = (GameObject)Instantiate(scriptFarm.objCarrot, tempPosition, Quaternion.identity);
 		return newCarrot.GetComponent<Carrot>();
+	}
+	
+	public static Carrot findCarrot(float rabbitX, float rabbitY){
+		Carrot result = null;
+		foreach(Carrot element in scriptFarm.carrotList){
+			if(Vector2.Distance((Vector2)(element.transform.position), new Vector2(rabbitX, rabbitY)) <= carrotSeeDistance){
+				result = element;
+				break;
+			}
+		};
+		return result;
 	}
 }

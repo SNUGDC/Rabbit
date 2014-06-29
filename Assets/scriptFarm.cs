@@ -8,6 +8,11 @@ public class scriptFarm : MonoBehaviour {
 	
 	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
 	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static List<Carrot> carrotList{
+		get{
+			return mCarrotList;
+		}
+	}
 	public static Rabbit targetBuffer{
 		get{
 			return mTargetBuffer;
@@ -19,6 +24,7 @@ public class scriptFarm : MonoBehaviour {
 	private static int mMoney = 1100;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
+	private static List<Carrot> mCarrotList = new List<Carrot>();
 	private static List<Rabbit> mRabbitList = new List<Rabbit>();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static GUIStyle mHelpStyle = new GUIStyle();
@@ -43,7 +49,7 @@ public class scriptFarm : MonoBehaviour {
 			mTargetBuffer = mTargetRabbit;
 		}
 		if(Input.GetMouseButtonDown(1)){
-			FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y);
+			mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){

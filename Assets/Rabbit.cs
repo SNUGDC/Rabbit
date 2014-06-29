@@ -95,7 +95,16 @@ public class Rabbit : MonoBehaviour {
 		if (!selected) {
 			switch(mJumpCounter){
 				case 4 :
-					mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
+					Carrot nearCarrot = FarmFunc.findCarrot(transform.position.x, transform.position.y);
+					if(nearCarrot){
+						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
+												  nearCarrot.gameObject.transform.position.y - transform.position.y);
+						mMovingDir.Normalize();
+						mMovingDir = mMovingDir * 10;
+					}
+					else{
+						mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
+					}
 					Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 					Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
 					if(mMovingDir.x + transform.position.x < maxLeftBottom.x || mMovingDir.x + transform.position.x > maxRightTop.x){
@@ -140,6 +149,7 @@ public class Rabbit : MonoBehaviour {
 	
 	void OnTriggerStay2D(Collider2D collider){
 		if(collider.gameObject.tag == "carrot" && !mSelected){
+			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
 			Destroy(collider.gameObject);
 			mHunger = 0;
 		}
