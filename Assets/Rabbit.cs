@@ -8,11 +8,11 @@ public class Rabbit : MonoBehaviour {
 	public enum Gender{MALE, FEMALE};
 	
 	public static ulong rabbitCounter = 0;
-	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
-	public static Sprite sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[0];
-	public static Sprite sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[1];
-	public static Sprite sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[2];
-	public static Sprite sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[3];
+	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
+	public static Sprite sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
+	public static Sprite sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
+	public static Sprite sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
+	public static Sprite sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
 	
 	public bool selected{
 		get{
@@ -41,6 +41,7 @@ public class Rabbit : MonoBehaviour {
 	private bool mSelected = false;
 	private bool mSelectBuffer = false;
 	private int mJumpCounter = 0;
+	private ulong mHunger;
 	private ulong mRabbitId;
 	private Vector3 mMovingDir;
 	private Gender mGender;
