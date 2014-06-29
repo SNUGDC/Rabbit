@@ -7,6 +7,7 @@ public class scriptFarm : MonoBehaviour {
 	enum GameState{GAME, DICT, HELP};
 	
 	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
+	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
 	
 	private bool mTestMode = false;
 	private bool mShowPopup = false;
@@ -35,6 +36,10 @@ public class scriptFarm : MonoBehaviour {
 			mTargetRabbit = FarmFunc.selectRabbit();
 			mShowPopup = (mTargetRabbit != null);
 			mTargetBuffer = mTargetRabbit;
+		}
+		if(Input.GetMouseButtonDown(1)){
+			FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y);
+			print("right click");
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){

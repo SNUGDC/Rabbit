@@ -73,7 +73,6 @@ public class FarmFunc : MonoBehaviour {
 		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
 		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
-		newRabbit.tag = "rabbit";
 		if(father == null || mother == null){
 			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, Gene.Type.DOMINANT, Gene.Type.RECESSIVE));
 		}
@@ -85,5 +84,11 @@ public class FarmFunc : MonoBehaviour {
 			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, first, second));
 		}
 		return newRabbit.GetComponent<Rabbit>();
+	}
+	public static Carrot createCarrot(float x, float y){
+		Vector3 tempPosition = Camera.main.ScreenToWorldPoint(new Vector3(x, y, 0));
+		tempPosition.z = 0;
+		GameObject newCarrot = (GameObject)Instantiate(scriptFarm.objCarrot, tempPosition, Quaternion.identity);
+		return newCarrot.GetComponent<Carrot>();
 	}
 }

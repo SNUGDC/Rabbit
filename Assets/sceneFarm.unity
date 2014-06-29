@@ -170,7 +170,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a2ca56bb31053440aff1a3dd46e40a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sWidth: 0
-  sHeight: 0
-  targetRabbit: {fileID: 0}
-  targetBuffer: {fileID: 0}
