@@ -9,6 +9,7 @@ public class Rabbit : MonoBehaviour {
 	
 	public enum Gender{MALE, FEMALE};
 	
+	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
 	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
 	public static Sprite sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
@@ -87,7 +88,10 @@ public class Rabbit : MonoBehaviour {
 	}
 	
 	void RabbitJump(){
-		++mHunger;
+		if(++mHunger > maxHunger){
+			Destroy(gameObject);
+			return;
+		}
 		if (!selected) {
 			switch(mJumpCounter){
 				case 4 :
@@ -133,6 +137,7 @@ public class Rabbit : MonoBehaviour {
 			transform.position = new Vector3(temp.x, temp.y, 0);
 		}
 	}
+	
 	void OnTriggerStay2D(Collider2D collider){
 		if(collider.gameObject.tag == "carrot" && !mSelected){
 			Destroy(collider.gameObject);

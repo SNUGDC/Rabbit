@@ -8,19 +8,24 @@ public class scriptFarm : MonoBehaviour {
 	
 	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
 	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static Rabbit targetBuffer{
+		get{
+			return mTargetBuffer;
+		}
+	}
 	
-	private bool mTestMode = false;
-	private bool mShowPopup = false;
-	private int mMoney = 1100;
-	private int mSWidth = Screen.width;
-	private int mSHeight = Screen.height;
-	private List<Rabbit> mRabbitList = new List<Rabbit>();
-	private GUIStyle mDictStyle = new GUIStyle();
-	private GUIStyle mHelpStyle = new GUIStyle();
-	private GUIStyle mPopupStyle = new GUIStyle();
-	private GameState mCurState = GameState.GAME;
-	private Rabbit mTargetRabbit = null;
-	private Rabbit mTargetBuffer = null;
+	private static bool mTestMode = false;
+	private static bool mShowPopup = false;
+	private static int mMoney = 1100;
+	private static int mSWidth = Screen.width;
+	private static int mSHeight = Screen.height;
+	private static List<Rabbit> mRabbitList = new List<Rabbit>();
+	private static GUIStyle mDictStyle = new GUIStyle();
+	private static GUIStyle mHelpStyle = new GUIStyle();
+	private static GUIStyle mPopupStyle = new GUIStyle();
+	private static GameState mCurState = GameState.GAME;
+	private static Rabbit mTargetRabbit = null;
+	private static Rabbit mTargetBuffer = null;
 	
 	void Start () {
 		mDictStyle.fontSize = 50;
@@ -46,6 +51,7 @@ public class scriptFarm : MonoBehaviour {
 				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
 				if(Input.mousePosition.x > mSWidth* 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
 					//in trash area
+					mRabbitList.Remove(mTargetRabbit);
 					DestroyImmediate (mTargetRabbit.gameObject);
 					mMoney += 200;
 				}
@@ -121,7 +127,7 @@ public class scriptFarm : MonoBehaviour {
 			string popupText = "";
 			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
 			popupText += ("name : (none)\n");
-			popupText += ("hunger : " + mTargetBuffer.hunger + "\n");
+			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
 			popupText += ("gender : " + mTargetBuffer.gender + "\n");
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";
