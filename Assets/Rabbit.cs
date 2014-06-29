@@ -57,7 +57,7 @@ public class Rabbit : MonoBehaviour {
 			mGender = Gender.FEMALE;
 			GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 		}
-		InvokeRepeating ("RabbitJump", 1.0f, 0.4f);
+		InvokeRepeating ("RabbitJump", 0.4f, 0.4f);
 	}
 	
 	// Update is called once per frame
@@ -112,9 +112,6 @@ public class Rabbit : MonoBehaviour {
 					break;
 			}
 			mJumpCounter = (mJumpCounter + 1) % 6;
-			if (++mJumpCounter >= 6) {
-				mJumpCounter = 0;
-			}
 		}
 		else{
 			mJumpCounter = 0;
