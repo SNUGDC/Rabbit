@@ -13,12 +13,13 @@ public class scriptFarm : MonoBehaviour {
 	private int mMoney = 1100;
 	private int mSWidth = Screen.width;
 	private int mSHeight = Screen.height;
-	private Rabbit mTargetRabbit = null;
-	private Rabbit mTargetBuffer = null;
-	private GameState mCurState = GameState.GAME;
+	private List<Rabbit> mRabbitList = new List<Rabbit>();
 	private GUIStyle mDictStyle = new GUIStyle();
 	private GUIStyle mHelpStyle = new GUIStyle();
 	private GUIStyle mPopupStyle = new GUIStyle();
+	private GameState mCurState = GameState.GAME;
+	private Rabbit mTargetRabbit = null;
+	private Rabbit mTargetBuffer = null;
 	
 	void Start () {
 		mDictStyle.fontSize = 50;
@@ -48,10 +49,10 @@ public class scriptFarm : MonoBehaviour {
 					//found rabbit with different gender
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
-							FarmFunc.createRabbit(anotherRabbit, mTargetRabbit);
+							mRabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
 						}
 						else{
-							FarmFunc.createRabbit(mTargetRabbit, anotherRabbit);
+							mRabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
 						}
 						mMoney -= 100;
 					}
@@ -87,7 +88,7 @@ public class scriptFarm : MonoBehaviour {
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
 			//buy button
 			if(mMoney >= 200 || mTestMode){
-				FarmFunc.createRabbit(null, null);
+				mRabbitList.Add(FarmFunc.createRabbit(null, null));
 				mMoney -= 200;
 			}
 		}
