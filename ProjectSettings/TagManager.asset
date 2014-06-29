@@ -43,3 +43,11 @@ TagManager:
     userID: 0
     uniqueID: 0
     locked: 0
+  - name: Rabbit
+    userID: 1
+    uniqueID: 3504841911
+    locked: 0
+  - name: Carrot
+    userID: 2
+    uniqueID: 938600627
+    locked: 0

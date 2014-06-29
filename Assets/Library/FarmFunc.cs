@@ -43,25 +43,26 @@ public class FarmFunc : MonoBehaviour {
 	}
 	
 	public static Rabbit selectRabbit(){
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
 		Rabbit result = null;
-		if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
-			if(hit.transform.tag == "rabbit"){
-				result = hit.transform.GetComponent<Rabbit>();
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.tag == "rabbit"){
+				result = element.transform.GetComponent<Rabbit>();
 				result.selected = true;
+				break;
 			}
 		}
 		return result;
 	}
 	public static Rabbit findAnotherRabbit(Rabbit target){
 		Rabbit result = null;
-		RaycastHit[] hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		hit = Physics.RaycastAll(ray, Mathf.Infinity);
-		for(int i = 0; i < hit.Length; ++i){
-			if(hit[i].transform.GetComponent<Rabbit>() != target){
-				result = hit[i].transform.GetComponent<Rabbit>();
+		RaycastHit2D[] hit;
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		hit = Physics2D.RaycastAll(ray, Vector2.zero);
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.GetComponent<Rabbit>() != target){
+				result = element.transform.GetComponent<Rabbit>();
 				break;
 			}
 		}

@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent (typeof(BoxCollider2D))]
+
 public class Rabbit : MonoBehaviour {
 	
 	
@@ -20,6 +22,11 @@ public class Rabbit : MonoBehaviour {
 		}
 		set{
 			mSelected = value;
+		}
+	}
+	public ulong hunger{
+		get{
+			return mHunger;
 		}
 	}
 	public ulong rabbitId{
@@ -80,6 +87,7 @@ public class Rabbit : MonoBehaviour {
 	}
 	
 	void RabbitJump(){
+		++mHunger;
 		if (!selected) {
 			switch(mJumpCounter){
 				case 4 :
@@ -123,6 +131,12 @@ public class Rabbit : MonoBehaviour {
 		if (selected) {
 			Vector3 temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			transform.position = new Vector3(temp.x, temp.y, 0);
+		}
+	}
+	void OnTriggerStay2D(Collider2D collider){
+		if(collider.gameObject.tag == "carrot" && !mSelected){
+			Destroy(collider.gameObject);
+			mHunger = 0;
 		}
 	}
 }

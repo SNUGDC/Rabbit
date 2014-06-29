@@ -39,7 +39,6 @@ public class scriptFarm : MonoBehaviour {
 		}
 		if(Input.GetMouseButtonDown(1)){
 			FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y);
-			print("right click");
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
@@ -122,6 +121,7 @@ public class scriptFarm : MonoBehaviour {
 			string popupText = "";
 			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
 			popupText += ("name : (none)\n");
+			popupText += ("hunger : " + mTargetBuffer.hunger + "\n");
 			popupText += ("gender : " + mTargetBuffer.gender + "\n");
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";
