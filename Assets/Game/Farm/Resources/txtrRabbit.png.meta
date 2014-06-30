@@ -92,5 +92,45 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
+    - name: txtrCarrot
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 58
+        width: 43
+        height: 33
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: txtrSmallRabbit
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 11
+        width: 56
+        height: 38
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: txtrSmallJump
+      rect:
+        serializedVersion: 2
+        x: 601
+        y: 53
+        width: 56
+        height: 38
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: txtrSmallLand
+      rect:
+        serializedVersion: 2
+        x: 601
+        y: 3
+        width: 56
+        height: 38
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
