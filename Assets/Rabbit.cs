@@ -9,6 +9,7 @@ public class Rabbit : MonoBehaviour {
 	
 	public enum Gender{MALE, FEMALE};
 	
+	public static readonly ulong startHunger = 30;
 	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
 	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
@@ -57,6 +58,7 @@ public class Rabbit : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+		//renderer.material.shader = Shader.Find("Diffuse");
 		mRabbitId = ++rabbitCounter;
 		if (Random.Range(0, 2) == 0) {
 			mGender = Gender.MALE;
@@ -92,11 +94,14 @@ public class Rabbit : MonoBehaviour {
 			Destroy(gameObject);
 			return;
 		}
+		else if(mHunger > startHunger){
+			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
+		}			
 		if (!selected) {
 			switch(mJumpCounter){
 				case 4 :
 					Carrot nearCarrot = FarmFunc.findCarrot(transform.position.x, transform.position.y);
-					if(nearCarrot){
+					if(nearCarrot && mHunger > startHunger){
 						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
 												  nearCarrot.gameObject.transform.position.y - transform.position.y);
 						mMovingDir.Normalize();
@@ -148,9 +153,10 @@ public class Rabbit : MonoBehaviour {
 	}
 	
 	void OnTriggerStay2D(Collider2D collider){
-		if(collider.gameObject.tag == "carrot" && !mSelected){
+		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
 			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
 			Destroy(collider.gameObject);
+			renderer.material.color = new Color(1.0f, 1.0f, 1.0f);
 			mHunger = 0;
 		}
 	}
