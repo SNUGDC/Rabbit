@@ -160,17 +160,22 @@ public class scriptFarm : MonoBehaviour {
 			popupText += ("gender : " + (mTargetBuffer.grow ? mTargetBuffer.gender.ToString() : "???") + "\n");
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";
-				if(mTargetBuffer.geneList[i].type[0] == Gene.Type.DOMINANT){
-					popupText += "X";
+				if(mTargetBuffer.grow){
+					if(mTargetBuffer.geneList[i].type[0] == Gene.Type.DOMINANT){
+						popupText += "X";
+					}
+					else{
+						popupText += "x";
+					}
+					if(mTargetBuffer.geneList[i].type[1] == Gene.Type.DOMINANT){
+						popupText += "X";
+					}
+					else{
+						popupText += "x";
+					}
 				}
 				else{
-					popupText += "x";
-				}
-				if(mTargetBuffer.geneList[i].type[1] == Gene.Type.DOMINANT){
-					popupText += "X";
-				}
-				else{
-					popupText += "x";
+					popupText += "???";
 				}
 				popupText += "\n";
 			}
