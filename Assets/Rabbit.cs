@@ -30,6 +30,9 @@ public class Rabbit : MonoBehaviour {
 		get{
 			return mHunger;
 		}
+		set{
+			mHunger = value;
+		}
 	}
 	public ulong rabbitId{
 		get{
@@ -52,12 +55,13 @@ public class Rabbit : MonoBehaviour {
 	private int mJumpCounter = 0;
 	private ulong mHunger;
 	private ulong mRabbitId;
+	private float mJumpRate = 0.4f;
 	private Vector3 mMovingDir;
 	private Gender mGender;
 	private List<Gene> mGeneList = new List<Gene>();
 	
 	// Use this for initialization
-	void Start () {
+	IEnumerator Start () {
 		//renderer.material.shader = Shader.Find("Diffuse");
 		mRabbitId = ++rabbitCounter;
 		if (Random.Range(0, 2) == 0) {
@@ -68,7 +72,9 @@ public class Rabbit : MonoBehaviour {
 			mGender = Gender.FEMALE;
 			GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 		}
-		InvokeRepeating ("RabbitJump", 0.4f, 0.4f);
+		mHunger = 0;
+		yield return StartCoroutine("RabbitJump");
+		
 	}
 	
 	// Update is called once per frame
@@ -89,21 +95,19 @@ public class Rabbit : MonoBehaviour {
 		}
 	}
 	
-	void RabbitJump(){
-		if(++mHunger > maxHunger){
-			Destroy(gameObject);
-			return;
-		}
-		else if(mHunger > startHunger){
-			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
-		}			
-		if (!selected) {
-			switch(mJumpCounter){
+	IEnumerator RabbitJump(){
+		while(mHunger <= maxHunger){
+			if(mHunger > startHunger){
+				renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
+				mJumpRate = 0.1f;
+			}			
+			if (!selected) {
+				switch(mJumpCounter){
 				case 4 :
 					Carrot nearCarrot = FarmFunc.findCarrot(transform.position.x, transform.position.y);
 					if(nearCarrot && mHunger > startHunger){
 						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
-												  nearCarrot.gameObject.transform.position.y - transform.position.y);
+						                          nearCarrot.gameObject.transform.position.y - transform.position.y);
 						mMovingDir.Normalize();
 						mMovingDir = mMovingDir * 10;
 					}
@@ -137,12 +141,17 @@ public class Rabbit : MonoBehaviour {
 						GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 					}
 					break;
+				}
+				mJumpCounter = (mJumpCounter + 1) % 6;
 			}
-			mJumpCounter = (mJumpCounter + 1) % 6;
+			else{
+				mJumpCounter = 0;
+			}
+			yield return new WaitForSeconds(mJumpRate);
 		}
-		else{
-			mJumpCounter = 0;
-		}
+		scriptFarm.rabbitList.Remove(this);
+		Destroy(gameObject);
+		yield break;
 	}
 	
 	void OnMouseDrag(){
@@ -158,6 +167,7 @@ public class Rabbit : MonoBehaviour {
 			Destroy(collider.gameObject);
 			renderer.material.color = new Color(1.0f, 1.0f, 1.0f);
 			mHunger = 0;
+			mJumpRate = 0.4f;
 		}
 	}
 }

@@ -13,6 +13,11 @@ public class scriptFarm : MonoBehaviour {
 			return mCarrotList;
 		}
 	}
+	public static List<Rabbit> rabbitList{
+		get{
+			return mRabbitList;
+		}
+	}
 	public static Rabbit targetBuffer{
 		get{
 			return mTargetBuffer;
@@ -40,6 +45,13 @@ public class scriptFarm : MonoBehaviour {
 		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
+		InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
+	}
+	
+	void IncreaseHunger(){
+		foreach(Rabbit element in mRabbitList){
+			++(element.hunger);
+		}
 	}
 	
 	void Update () {
