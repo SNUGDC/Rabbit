@@ -156,11 +156,23 @@ public class Rabbit : MonoBehaviour {
 	
 	void OnMouseDrag(){
 		if (selected) {
-			Vector3 temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			transform.position = new Vector3(temp.x, temp.y, 0);
+			Vector2 temp = Input.mousePosition;
+			if(temp.x < 0){
+				temp.x = 0;
+			}
+			else if(temp.x > scriptFarm.sWidth * 0.9f){
+				temp.x = scriptFarm.sWidth * 0.9f;
+			}
+			if(temp.y < 0){
+				temp.y = 0;
+			}
+			else if(temp.y > scriptFarm.sHeight * 0.9f){
+				temp.y = scriptFarm.sHeight * 0.9f;
+			}
+			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
 		}
 	}
-	
+
 	void OnTriggerStay2D(Collider2D collider){
 		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
 			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));

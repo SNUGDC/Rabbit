@@ -8,6 +8,16 @@ public class scriptFarm : MonoBehaviour {
 	
 	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
 	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static int sWidth{
+		get{
+			return mSWidth;
+		}
+	}
+	public static int sHeight{
+		get{
+			return mSHeight;
+		}
+	}
 	public static List<Carrot> carrotList{
 		get{
 			return mCarrotList;
