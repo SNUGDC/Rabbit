@@ -7,18 +7,36 @@ public class scriptFarm : MonoBehaviour {
 	enum GameState{GAME, DICT, HELP};
 	
 	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
+	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static List<Carrot> carrotList{
+		get{
+			return mCarrotList;
+		}
+	}
+	public static List<Rabbit> rabbitList{
+		get{
+			return mRabbitList;
+		}
+	}
+	public static Rabbit targetBuffer{
+		get{
+			return mTargetBuffer;
+		}
+	}
 	
-	private bool mTestMode = false;
-	private bool mShowPopup = false;
-	private int mMoney = 1100;
-	private int mSWidth = Screen.width;
-	private int mSHeight = Screen.height;
-	private Rabbit mTargetRabbit = null;
-	private Rabbit mTargetBuffer = null;
-	private GameState mCurState = GameState.GAME;
-	private GUIStyle mDictStyle = new GUIStyle();
-	private GUIStyle mHelpStyle = new GUIStyle();
-	private GUIStyle mPopupStyle = new GUIStyle();
+	private static bool mTestMode = false;
+	private static bool mShowPopup = false;
+	private static int mMoney = 1100;
+	private static int mSWidth = Screen.width;
+	private static int mSHeight = Screen.height;
+	private static List<Carrot> mCarrotList = new List<Carrot>();
+	private static List<Rabbit> mRabbitList = new List<Rabbit>();
+	private static GUIStyle mDictStyle = new GUIStyle();
+	private static GUIStyle mHelpStyle = new GUIStyle();
+	private static GUIStyle mPopupStyle = new GUIStyle();
+	private static GameState mCurState = GameState.GAME;
+	private static Rabbit mTargetRabbit = null;
+	private static Rabbit mTargetBuffer = null;
 	
 	void Start () {
 		mDictStyle.fontSize = 50;
@@ -27,6 +45,13 @@ public class scriptFarm : MonoBehaviour {
 		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
+		InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
+	}
+	
+	void IncreaseHunger(){
+		foreach(Rabbit element in mRabbitList){
+			++(element.hunger);
+		}
 	}
 	
 	void Update () {
@@ -35,12 +60,16 @@ public class scriptFarm : MonoBehaviour {
 			mShowPopup = (mTargetRabbit != null);
 			mTargetBuffer = mTargetRabbit;
 		}
+		if(Input.GetMouseButtonDown(1)){
+			mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
+		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
 				mTargetRabbit.selected = false;
 				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
 				if(Input.mousePosition.x > mSWidth* 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
 					//in trash area
+					mRabbitList.Remove(mTargetRabbit);
 					DestroyImmediate (mTargetRabbit.gameObject);
 					mMoney += 200;
 				}
@@ -48,10 +77,10 @@ public class scriptFarm : MonoBehaviour {
 					//found rabbit with different gender
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
-							FarmFunc.createRabbit(anotherRabbit, mTargetRabbit);
+							mRabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
 						}
 						else{
-							FarmFunc.createRabbit(mTargetRabbit, anotherRabbit);
+							mRabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
 						}
 						mMoney -= 100;
 					}
@@ -87,7 +116,7 @@ public class scriptFarm : MonoBehaviour {
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
 			//buy button
 			if(mMoney >= 200 || mTestMode){
-				FarmFunc.createRabbit(null, null);
+				mRabbitList.Add(FarmFunc.createRabbit(null, null));
 				mMoney -= 200;
 			}
 		}
@@ -116,6 +145,7 @@ public class scriptFarm : MonoBehaviour {
 			string popupText = "";
 			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
 			popupText += ("name : (none)\n");
+			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
 			popupText += ("gender : " + mTargetBuffer.gender + "\n");
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";

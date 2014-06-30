@@ -33,7 +33,7 @@ public struct Gene{
 
 public class FarmFunc : MonoBehaviour {
 	
-	public GameObject objRabbit;
+	public static readonly ulong carrotSeeDistance = 200;
 
 	// Use this for initialization
 	void Start () {
@@ -43,37 +43,39 @@ public class FarmFunc : MonoBehaviour {
 	}
 	
 	public static Rabbit selectRabbit(){
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
 		Rabbit result = null;
-		if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
-			if(hit.transform.tag == "rabbit"){
-				result = hit.transform.GetComponent<Rabbit>();
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.tag == "rabbit"){
+				result = element.transform.GetComponent<Rabbit>();
 				result.selected = true;
-			}
-		}
-		return result;
-	}
-	public static Rabbit findAnotherRabbit(Rabbit target){
-		Rabbit result = null;
-		RaycastHit[] hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		hit = Physics.RaycastAll(ray, Mathf.Infinity);
-		for(int i = 0; i < hit.Length; ++i){
-			if(hit[i].transform.GetComponent<Rabbit>() != target){
-				result = hit[i].transform.GetComponent<Rabbit>();
 				break;
 			}
 		}
 		return result;
 	}
+	
+	public static Rabbit findAnotherRabbit(Rabbit target){
+		Rabbit result = null;
+		RaycastHit2D[] hit;
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		hit = Physics2D.RaycastAll(ray, Vector2.zero);
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.GetComponent<Rabbit>() != target){
+				result = element.transform.GetComponent<Rabbit>();
+				break;
+			}
+		}
+		return result;
+	}
+	
 	public static Rabbit createRabbit(Rabbit father, Rabbit mother){
 		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
 		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
 		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
-		newRabbit.tag = "rabbit";
 		if(father == null || mother == null){
 			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, Gene.Type.DOMINANT, Gene.Type.RECESSIVE));
 		}
@@ -85,5 +87,23 @@ public class FarmFunc : MonoBehaviour {
 			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, first, second));
 		}
 		return newRabbit.GetComponent<Rabbit>();
+	}
+	
+	public static Carrot createCarrot(float x, float y){
+		Vector3 tempPosition = Camera.main.ScreenToWorldPoint(new Vector3(x, y, 0));
+		tempPosition.z = 0;
+		GameObject newCarrot = (GameObject)Instantiate(scriptFarm.objCarrot, tempPosition, Quaternion.identity);
+		return newCarrot.GetComponent<Carrot>();
+	}
+	
+	public static Carrot findCarrot(float rabbitX, float rabbitY){
+		Carrot result = null;
+		foreach(Carrot element in scriptFarm.carrotList){
+			if(Vector2.Distance((Vector2)(element.transform.position), new Vector2(rabbitX, rabbitY)) <= carrotSeeDistance){
+				result = element;
+				break;
+			}
+		};
+		return result;
 	}
 }
