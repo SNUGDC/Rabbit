@@ -83,7 +83,8 @@ public class scriptFarm : MonoBehaviour {
 					DestroyImmediate (mTargetRabbit.gameObject);
 					mMoney += 200;
 				}
-				else if(anotherRabbit != null && anotherRabbit.gender != mTargetRabbit.gender){
+				else if(anotherRabbit != null && anotherRabbit.gender != mTargetRabbit.gender
+					 && anotherRabbit.grow && mTargetRabbit.grow){
 					//found rabbit with different gender
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
@@ -156,7 +157,7 @@ public class scriptFarm : MonoBehaviour {
 			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
 			popupText += ("name : (none)\n");
 			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
-			popupText += ("gender : " + mTargetBuffer.gender + "\n");
+			popupText += ("gender : " + (mTargetBuffer.grow ? mTargetBuffer.gender.ToString() : "???") + "\n");
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";
 				if(mTargetBuffer.geneList[i].type[0] == Gene.Type.DOMINANT){

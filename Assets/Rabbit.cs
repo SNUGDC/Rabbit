@@ -17,7 +17,15 @@ public class Rabbit : MonoBehaviour {
 	public static Sprite sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
 	public static Sprite sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
 	public static Sprite sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
+	public static Sprite sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
+	public static Sprite sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
+	public static Sprite sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
 	
+	public bool grow{
+		get{
+			return mGrow;
+		}
+	}
 	public bool selected{
 		get{
 			return mSelected;
@@ -50,6 +58,7 @@ public class Rabbit : MonoBehaviour {
 		}
 	}
 	
+	private bool mGrow = false;
 	private bool mSelected = false;
 	private bool mSelectBuffer = false;
 	private int mJumpCounter = 0;
@@ -66,12 +75,13 @@ public class Rabbit : MonoBehaviour {
 		mRabbitId = ++rabbitCounter;
 		if (Random.Range(0, 2) == 0) {
 			mGender = Gender.MALE;
-			GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
+			//GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 		}
 		else{
 			mGender = Gender.FEMALE;
-			GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
+			//GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 		}
+		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 		mHunger = 0;
 		yield return StartCoroutine("RabbitJump");
 		
@@ -84,7 +94,10 @@ public class Rabbit : MonoBehaviour {
 				GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
 			}
 			else{
-				if (mGender == Gender.MALE) {
+				if(!mGrow){
+					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+				}
+				else if (mGender == Gender.MALE) {
 					GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 				}
 				else{
@@ -125,16 +138,29 @@ public class Rabbit : MonoBehaviour {
 					transform.position = new Vector3(transform.position.x + mMovingDir.x / 2,
 					                                 transform.position.y +  mMovingDir.y / 2,
 					                                 0);
-					GetComponent<SpriteRenderer> ().sprite = sprRabbitJump;
+					if(mGrow){
+						GetComponent<SpriteRenderer> ().sprite = sprRabbitJump;
+					}
+					else{
+						GetComponent<SpriteRenderer>().sprite = sprSmallJump;
+					}
 					break;
 				case 5 :
 					transform.position = new Vector3(transform.position.x + mMovingDir.x / 2,
 					                                 transform.position.y +  mMovingDir.y / 2,
 					                                 0);
-					GetComponent<SpriteRenderer> ().sprite = sprRabbitLand;
+					if(mGrow){
+						GetComponent<SpriteRenderer> ().sprite = sprRabbitLand;
+					}
+					else{
+						GetComponent<SpriteRenderer>().sprite = sprSmallLand;
+					}
 					break;
 				default :
-					if (mGender == Gender.MALE) {
+					if(!mGrow){
+						GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+					}
+					else if (mGender == Gender.MALE) {
 						GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 					}
 					else {
@@ -180,6 +206,9 @@ public class Rabbit : MonoBehaviour {
 			renderer.material.color = new Color(1.0f, 1.0f, 1.0f);
 			mHunger = 0;
 			mJumpRate = 0.4f;
+			if(!mGrow){
+				mGrow = true;
+			}
 		}
 	}
 }
