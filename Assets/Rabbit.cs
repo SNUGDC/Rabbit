@@ -2,14 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent (typeof(BoxCollider2D))]
+public struct RabbitData{
+	private bool mGrow;
+	
+}
 
 public class Rabbit : MonoBehaviour {
 	
 	
 	public enum Gender{MALE, FEMALE};
 	
-	public static readonly ulong startHunger = 30;
+	public static readonly ulong startHunger = 20;
 	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
 	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
@@ -117,7 +120,7 @@ public class Rabbit : MonoBehaviour {
 			if (!selected) {
 				switch(mJumpCounter){
 				case 4 :
-					Carrot nearCarrot = FarmFunc.findCarrot(transform.position.x, transform.position.y);
+					Carrot nearCarrot = FarmFunc.findNearCarrot(transform.position.x, transform.position.y);
 					if(nearCarrot && mHunger > startHunger){
 						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
 						                          nearCarrot.gameObject.transform.position.y - transform.position.y);

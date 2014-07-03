@@ -96,14 +96,17 @@ public class FarmFunc : MonoBehaviour {
 		return newCarrot.GetComponent<Carrot>();
 	}
 	
-	public static Carrot findCarrot(float rabbitX, float rabbitY){
+	public static Carrot findNearCarrot(float rabbitX, float rabbitY){
 		Carrot result = null;
+		float minDistance = carrotSeeDistance;
+		float tempDistance = 0;
 		foreach(Carrot element in scriptFarm.carrotList){
-			if(Vector2.Distance((Vector2)(element.transform.position), new Vector2(rabbitX, rabbitY)) <= carrotSeeDistance){
+			tempDistance = Vector2.Distance((Vector2)(element.transform.position), new Vector2(rabbitX, rabbitY));
+			if(tempDistance < minDistance){
+				minDistance = tempDistance;
 				result = element;
-				break;
 			}
-		};
+		}
 		return result;
 	}
 }
