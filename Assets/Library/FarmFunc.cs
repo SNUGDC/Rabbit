@@ -1,45 +1,63 @@
 ﻿using UnityEngine;
+using LitJson;
 using System.Collections;
+using System.Collections.Generic;
+
+public struct JsonGene{
+	public string name;
+	public string[] domGene;
+	public string[] recGene;
+	public uint numFactor;
+	public uint numDominant;
+}
 
 public struct Gene{
-	public enum Law{BASIC};
-	public enum Type{DOMINANT, RECESSIVE};
-	
-	public string name{
-		get{
-			return mName;
+	public string name;
+	public int index;
+	public string[,] factor;
+	public Gene(JsonGene original){
+		name = original.name;
+		index = FarmFunc.jsonGeneList.IndexOf(original);
+		if(original.domGene == null && original.recGene == null){
+			factor = null;
+			return;
 		}
-	}
-	public Law law{
-		get{
-			return mLaw;
+		factor = new string[original.numDominant, original.numFactor];
+		int tempRandom;
+		for(int i = 0; i < original.numDominant; ++i){
+			for(int j = 0; j < original.numFactor; ++j){
+				tempRandom = Random.Range(0, original.domGene.Length + original.recGene.Length);
+				factor[i, j] = (tempRandom >= original.domGene.Length) ? original.recGene[tempRandom - original.domGene.Length] : original.domGene[tempRandom];
+			}
 		}
-	}
-	public Type[] type{
-		get{
-			return mType;
-		}
-	}
-	
-	private string mName;
-	private Law mLaw;
-	private Type[] mType;
-	
-	public Gene(string inName, Law inLaw, Type firstType, Type secondType){
-		mType = new Type[2];
-		mName = inName; mLaw = inLaw; mType[0] = firstType; mType[1] = secondType;
 	}
 }
 
 public class FarmFunc : MonoBehaviour {
 	
 	public static readonly ulong carrotSeeDistance = 200;
+	public static List<JsonGene> jsonGeneList = new List<JsonGene>();
 
 	// Use this for initialization
 	void Start () {
 	}
 	// Update is called once per frame
 	void Update () {
+	}
+	
+	public static void init(){
+		jsonGeneList.Clear();
+		System.IO.StreamReader inFile = new System.IO.StreamReader("Assets/GeneFile.json");
+		string read = null, json = null;
+		while(inFile.Peek() >= 0){
+			do{
+				read = inFile.ReadLine();
+				json += read + "\n";
+			}while(read != "}");
+			jsonGeneList.Add(JsonMapper.ToObject<JsonGene>(json));
+			json = null;
+		}
+		inFile.Close ();
 	}
 	
 	public static Rabbit selectRabbit(){
@@ -77,14 +95,19 @@ public class FarmFunc : MonoBehaviour {
 		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
 		if(father == null || mother == null){
-			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, Gene.Type.DOMINANT, Gene.Type.RECESSIVE));
+			foreach(JsonGene element in jsonGeneList){
+				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
+			}
 		}
 		else{
-			int tempRandom = Random.Range(0, 2);
-			Gene.Type first = (tempRandom == 0) ? father.geneList[0].type[0] : father.geneList[0].type[1];
-			tempRandom = Random.Range(0, 2);
-			Gene.Type second = (tempRandom == 0) ? mother.geneList[0].type[0] : mother.geneList[0].type[1];
+			foreach(JsonGene element in jsonGeneList){
+				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
+			}
+			/*
+			Gene.Type first = (Gene.Type)(Random.Range(0, 2));
+			Gene.Type second = (Gene.Type)(Random.Range(0, 2));
 			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, first, second));
+			*/
 		}
 		return newRabbit.GetComponent<Rabbit>();
 	}

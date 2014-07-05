@@ -2,11 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public struct RabbitData{
-	private bool mGrow;
-	
-}
-
 public class Rabbit : MonoBehaviour {
 	
 	

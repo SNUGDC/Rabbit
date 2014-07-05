@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using LitJson;
 using System.Collections;
 
 public class scriptPrepare : MonoBehaviour {

@@ -1,0 +1,7 @@
+{
+	"name" : "Ear",
+	"domGene" : ["X"],
+	"recGene" : ["x"],
+	"numFactor" : 2,
+	"numDominant" : 1
+}
