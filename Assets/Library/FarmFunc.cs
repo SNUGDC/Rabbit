@@ -31,6 +31,21 @@ public struct Gene{
 			}
 		}
 	}
+	public Gene(Gene father, Gene mother){
+		if(father.name != mother.name || father.index != mother.index){
+			name = "error!";
+			index = -1;
+			return;
+		}
+		name = father.name;
+		index = father.index;
+		factor = new string[father.factor.GetLength(0), father.factor.GetLength(1)];
+		for(int i = 0; i < factor.GetLength(0); ++i){
+			for(int j = 0; j < factor.GetLength(1); ++j){
+				factor[i, j] = (Random.Range(0, 2) == 0) ? father.factor[i, j] : mother.factor[i, j];
+			}
+		}
+	}
 }
 
 public class FarmFunc : MonoBehaviour {
@@ -100,14 +115,9 @@ public class FarmFunc : MonoBehaviour {
 			}
 		}
 		else{
-			foreach(JsonGene element in jsonGeneList){
-				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
+			for(int i = 0; i < father.geneList.Count; ++i){
+				newRabbit.GetComponent<Rabbit>().geneList.Add(new Gene(father.geneList[i], mother.geneList[i]));
 			}
-			/*
-			Gene.Type first = (Gene.Type)(Random.Range(0, 2));
-			Gene.Type second = (Gene.Type)(Random.Range(0, 2));
-			newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene("Ear", Gene.Law.BASIC, first, second));
-			*/
 		}
 		return newRabbit.GetComponent<Rabbit>();
 	}

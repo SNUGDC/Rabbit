@@ -10,14 +10,14 @@ public class Rabbit : MonoBehaviour {
 	public static readonly ulong startHunger = 20;
 	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
-	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
-	public static Sprite sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
-	public static Sprite sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
-	public static Sprite sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
-	public static Sprite sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
-	public static Sprite sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
-	public static Sprite sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
-	public static Sprite sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
+	public static Sprite sprMaleRabbitStand;
+	public static Sprite sprFemaleRabbitStand;
+	public static Sprite sprRabbitHold;
+	public static Sprite sprRabbitJump;
+	public static Sprite sprRabbitLand;
+	public static Sprite sprSmallRabbit;
+	public static Sprite sprSmallJump;
+	public static Sprite sprSmallLand;
 	
 	public bool grow{
 		get{
@@ -66,6 +66,17 @@ public class Rabbit : MonoBehaviour {
 	private Vector3 mMovingDir;
 	private Gender mGender;
 	private List<Gene> mGeneList = new List<Gene>();
+	
+	public static void initRabbit(){
+		sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
+		sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
+		sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
+		sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
+		sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
+		sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
+		sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
+		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
+	}
 	
 	// Use this for initialization
 	IEnumerator Start () {

@@ -7,8 +7,8 @@ public class scriptFarm : MonoBehaviour {
 
 	enum GameState{GAME, DICT, HELP};
 	
-	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
-	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static GameObject objRabbit;
+	public static GameObject objCarrot;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -50,6 +50,9 @@ public class scriptFarm : MonoBehaviour {
 	private static Rabbit mTargetBuffer = null;
 	
 	void Start () {
+		objRabbit = (GameObject)Resources.Load("prefabRabbit");
+		objCarrot = (GameObject)Resources.Load("prefabCarrot");
+		Rabbit.initRabbit();
 		FarmFunc.init();
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
