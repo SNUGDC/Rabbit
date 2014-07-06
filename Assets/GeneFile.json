@@ -1,7 +1,64 @@
 {
-	"name" : "Ear",
-	"domGene" : ["X"],
-	"recGene" : ["x"],
+	"name" : "size",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 4
+}
+{
+	"name" : "color",
+	"factorList" : [
+					["BL", "W", "R", "B", "Y"]
+				   ],
 	"numFactor" : 2,
 	"numDominant" : 1
+}
+{
+	"name" : "pattern",
+	"factorList" : [
+					["♠"],
+					["◆"],
+					["♥"],
+					["♣"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 1
+}
+{
+	"name" : "Ear",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 1
+}
+{
+	"name" : "EyeColor",
+	"factorList" : [
+					["A", "B"],
+					["O"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 1
+}
+{
+	"name" : "Teeth",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 1
+}
+{
+	"name" : "Length",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numFactor" : 2,
+	"numDominant" : 4
 }

@@ -7,7 +7,7 @@ public class Rabbit : MonoBehaviour {
 	
 	public enum Gender{MALE, FEMALE};
 	
-	public static readonly ulong startHunger = 20;
+	public static readonly ulong startHunger = 15;
 	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
 	public static Sprite sprMaleRabbitStand;

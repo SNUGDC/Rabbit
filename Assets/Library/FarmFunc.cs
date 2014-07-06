@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public struct JsonGene{
 	public string name;
-	public string[] domGene;
-	public string[] recGene;
+	public string[][] factorList;
 	public uint numFactor;
 	public uint numDominant;
 }
@@ -18,7 +17,7 @@ public struct Gene{
 	public Gene(JsonGene original){
 		name = original.name;
 		index = FarmFunc.jsonGeneList.IndexOf(original);
-		if(original.domGene == null && original.recGene == null){
+		if(original.factorList == null){
 			factor = null;
 			return;
 		}
@@ -26,8 +25,16 @@ public struct Gene{
 		int tempRandom;
 		for(int i = 0; i < original.numDominant; ++i){
 			for(int j = 0; j < original.numFactor; ++j){
-				tempRandom = Random.Range(0, original.domGene.Length + original.recGene.Length);
-				factor[i, j] = (tempRandom >= original.domGene.Length) ? original.recGene[tempRandom - original.domGene.Length] : original.domGene[tempRandom];
+				int totalLength = 0;
+				foreach(string[] element in original.factorList){
+					totalLength += element.Length;
+				}
+				tempRandom = Random.Range(0, totalLength);
+				int count = 0;
+				while(tempRandom >= original.factorList[count].Length){
+					tempRandom -= original.factorList[count++].Length;
+				}
+				factor[i, j] = original.factorList[count][tempRandom];
 			}
 		}
 	}
