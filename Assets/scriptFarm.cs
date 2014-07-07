@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
 	enum GameState{GAME, DICT, HELP};
 	
-	public static GameObject objRabbit = (GameObject)Resources.Load("prefabRabbit");
-	public static GameObject objCarrot = (GameObject)Resources.Load("prefabCarrot");
+	public static GameObject objRabbit;
+	public static GameObject objCarrot;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -49,6 +50,10 @@ public class scriptFarm : MonoBehaviour {
 	private static Rabbit mTargetBuffer = null;
 	
 	void Start () {
+		objRabbit = (GameObject)Resources.Load("prefabRabbit");
+		objCarrot = (GameObject)Resources.Load("prefabCarrot");
+		Rabbit.initRabbit();
+		FarmFunc.init();
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mHelpStyle.fontSize = 50;
@@ -161,18 +166,13 @@ public class scriptFarm : MonoBehaviour {
 			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
 				popupText += mTargetBuffer.geneList[i].name + " : ";
 				if(mTargetBuffer.grow){
-					if(mTargetBuffer.geneList[i].type[0] == Gene.Type.DOMINANT){
-						popupText += "X";
+					for(int j = 0; j < mTargetBuffer.geneList[i].factor.GetLength(0); ++j){
+						for(int k = 0; k < mTargetBuffer.geneList[i].factor.GetLength(1); ++k){
+							popupText += mTargetBuffer.geneList[i].factor[j, k];
+						}
+						popupText += ", ";
 					}
-					else{
-						popupText += "x";
-					}
-					if(mTargetBuffer.geneList[i].type[1] == Gene.Type.DOMINANT){
-						popupText += "X";
-					}
-					else{
-						popupText += "x";
-					}
+					popupText = popupText.Remove(popupText.Length - 2, 2);
 				}
 				else{
 					popupText += "???";
