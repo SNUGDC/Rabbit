@@ -46,10 +46,10 @@ public struct Gene{
 			return;
 		}
 		name = father.name;
-		factor = new string[father.factor.Length, 2];
-		factorIndex = new int[father.factor.Length, 2, 2];
+		factor = new string[father.factor.GetLength(0), 2];
+		factorIndex = new int[father.factor.GetLength(0), 2, 2];
 		originalGene = father.originalGene;
-		for(int i = 0; i < father.factor.Length; ++i){
+		for(int i = 0; i < father.factor.GetLength(0); ++i){
 			if(Random.Range(0, 2) == 0){
 				factor[i, 0] = father.factor[i, 0];
 				factorIndex[i, 0, 0] = father.factorIndex[i, 0, 0];
