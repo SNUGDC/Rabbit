@@ -4,16 +4,31 @@
 					["X"],
 					["x"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 4
+	"numDominant" : 4,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
 }
 {
 	"name" : "color",
 	"factorList" : [
 					["BL", "W", "R", "B", "Y"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 1
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								["Black", "Gray", "Black", "Black", "Black"],
+								["Gray", "White", "Pink", "SkyBlue", "Primrose"],
+								["Black", "Pink", "Red", "Purple", "Orange"],
+								["Black", "SkyBlue", "Purple", "Blue", "Green"],
+								["Black", "Primrose", "Orange", "Green", "Yellow"]
+							]
+						]
 }
 {
 	"name" : "pattern",
@@ -23,42 +38,84 @@
 					["♥"],
 					["♣"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 1
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[null]
+							],
+							[
+								[null]
+							],
+							[
+								[null]
+							],
+							[
+								[null]
+							]
+						]
 }
 {
-	"name" : "Ear",
+	"name" : "ear",
 	"factorList" : [
 					["X"],
 					["x"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 1
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
 }
 {
-	"name" : "EyeColor",
+	"name" : "eyecolor",
 	"factorList" : [
 					["A", "B"],
 					["O"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 1
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								["Blue", "Black"],
+							 	["Black", "Jade"]
+							],
+							[
+								["Red"]
+							]
+						]
 }
 {
-	"name" : "Teeth",
+	"name" : "teeth",
 	"factorList" : [
 					["X"],
 					["x"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 1
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
 }
 {
-	"name" : "Length",
+	"name" : "length",
 	"factorList" : [
 					["X"],
 					["x"]
 				   ],
-	"numFactor" : 2,
-	"numDominant" : 4
+	"numDominant" : 4,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
 }

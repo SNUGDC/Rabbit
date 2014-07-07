@@ -65,6 +65,7 @@ public class Rabbit : MonoBehaviour {
 	private float mJumpRate = 0.4f;
 	private Vector3 mMovingDir;
 	private Gender mGender;
+	private Color mColor;
 	private List<Gene> mGeneList = new List<Gene>();
 	
 	public static void initRabbit(){
@@ -80,20 +81,17 @@ public class Rabbit : MonoBehaviour {
 	
 	// Use this for initialization
 	IEnumerator Start () {
-		//renderer.material.shader = Shader.Find("Diffuse");
 		mRabbitId = ++rabbitCounter;
 		if (Random.Range(0, 2) == 0) {
 			mGender = Gender.MALE;
-			//GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 		}
 		else{
 			mGender = Gender.FEMALE;
-			//GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 		}
+		mColor = new Color(1, 1, 1);
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 		mHunger = 0;
 		yield return StartCoroutine("RabbitJump");
-		
 	}
 	
 	// Update is called once per frame
@@ -212,12 +210,13 @@ public class Rabbit : MonoBehaviour {
 		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
 			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
 			Destroy(collider.gameObject);
-			renderer.material.color = new Color(1.0f, 1.0f, 1.0f);
 			mHunger = 0;
 			mJumpRate = 0.4f;
 			if(!mGrow){
 				mGrow = true;
+				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, float arg2){return arg1 / arg2;});
 			}
+			renderer.material.color = mColor;
 		}
 	}
 }
