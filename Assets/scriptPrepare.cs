@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
+using LitJson;
 using System.Collections;
 
 public class scriptPrepare : MonoBehaviour {
 	public int sWidth;
 	public int sHeight;
 
-	//private Texture2D txtrPrepareButton;
 	// Use this for initialization
 	void Start () {
-		//txtrPrepareButton = (Texture2D)Resources.Load ("txtrPrepareButton");
 	}
 	
 	// Update is called once per frame

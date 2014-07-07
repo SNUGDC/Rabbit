@@ -2,27 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public struct RabbitData{
-	private bool mGrow;
-	
-}
-
 public class Rabbit : MonoBehaviour {
 	
 	
 	public enum Gender{MALE, FEMALE};
 	
-	public static readonly ulong startHunger = 20;
+	public static readonly ulong startHunger = 15;
 	public static readonly ulong maxHunger = 50;
 	public static ulong rabbitCounter = 0;
-	public static Sprite sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
-	public static Sprite sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
-	public static Sprite sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
-	public static Sprite sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
-	public static Sprite sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
-	public static Sprite sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
-	public static Sprite sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
-	public static Sprite sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
+	public static Sprite sprMaleRabbitStand;
+	public static Sprite sprFemaleRabbitStand;
+	public static Sprite sprRabbitHold;
+	public static Sprite sprRabbitJump;
+	public static Sprite sprRabbitLand;
+	public static Sprite sprSmallRabbit;
+	public static Sprite sprSmallJump;
+	public static Sprite sprSmallLand;
 	
 	public bool grow{
 		get{
@@ -70,24 +65,33 @@ public class Rabbit : MonoBehaviour {
 	private float mJumpRate = 0.4f;
 	private Vector3 mMovingDir;
 	private Gender mGender;
+	private Color mColor;
 	private List<Gene> mGeneList = new List<Gene>();
+	
+	public static void initRabbit(){
+		sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
+		sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
+		sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
+		sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
+		sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
+		sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
+		sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
+		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
+	}
 	
 	// Use this for initialization
 	IEnumerator Start () {
-		//renderer.material.shader = Shader.Find("Diffuse");
 		mRabbitId = ++rabbitCounter;
 		if (Random.Range(0, 2) == 0) {
 			mGender = Gender.MALE;
-			//GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 		}
 		else{
 			mGender = Gender.FEMALE;
-			//GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 		}
+		mColor = new Color(1, 1, 1);
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 		mHunger = 0;
 		yield return StartCoroutine("RabbitJump");
-		
 	}
 	
 	// Update is called once per frame
@@ -206,12 +210,13 @@ public class Rabbit : MonoBehaviour {
 		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
 			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
 			Destroy(collider.gameObject);
-			renderer.material.color = new Color(1.0f, 1.0f, 1.0f);
 			mHunger = 0;
 			mJumpRate = 0.4f;
 			if(!mGrow){
 				mGrow = true;
+				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, float arg2){return arg1 / arg2;});
 			}
+			renderer.material.color = mColor;
 		}
 	}
 }
