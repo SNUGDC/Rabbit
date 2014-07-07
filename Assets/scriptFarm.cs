@@ -76,13 +76,15 @@ public class scriptFarm : MonoBehaviour {
 			mTargetBuffer = mTargetRabbit;
 		}
 		if(Input.GetMouseButtonDown(1)){
-			mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
+			if(Input.mousePosition.x <= mSWidth * 0.9f && Input.mousePosition.y <= mSHeight * 0.9f){
+				mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
+			}
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
 				mTargetRabbit.selected = false;
 				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
-				if(Input.mousePosition.x > mSWidth* 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
+				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
 					//in trash area
 					mRabbitList.Remove(mTargetRabbit);
 					DestroyImmediate (mTargetRabbit.gameObject);
