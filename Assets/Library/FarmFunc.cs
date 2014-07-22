@@ -95,7 +95,7 @@ public class FarmFunc : MonoBehaviour {
 	
 	public static void init(){
 		jsonGeneList.Clear();
-		System.IO.StreamReader inFile = new System.IO.StreamReader("Assets/GeneFile.json");
+		System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("GeneFile").text);
 		string read = null, json = null;
 		while(inFile.Peek() >= 0){
 			do{
