@@ -65,15 +65,14 @@ public class Rabbit : MonoBehaviour {
 	
 	private bool mGrow = false;
 	private bool mSelected = false;
-	private bool mSelectBuffer = false;
 	private int mJumpCounter = 0;
-	private ulong mHunger;
+	private ulong mHunger = 0;
 	private ulong mLife;
 	private int mRabbitId;
 	private float mJumpRate = 0.4f;
 	private Vector3 mMovingDir;
 	private Gender mGender;
-	private Color mColor;
+	private Color mColor = new Color(1, 1, 1);
 	private List<Gene> mGeneList = new List<Gene>();
 	
 	public static void init(){
@@ -90,15 +89,8 @@ public class Rabbit : MonoBehaviour {
 	// Use this for initialization
 	IEnumerator Start () {
 		mRabbitId = rabbitList.Count;
-		if (Random.Range(0, 2) == 0) {
-			mGender = Gender.MALE;
-		}
-		else{
-			mGender = Gender.FEMALE;
-		}
-		mColor = new Color(1, 1, 1);
+		mGender = (Random.Range(0, 2) == 0) ? Gender.MALE : Gender.FEMALE;
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-		mHunger = 0;
 		//InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
 		yield return StartCoroutine("RabbitJump");
 	}
@@ -106,22 +98,19 @@ public class Rabbit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		++mHunger;
-		if (mSelected != mSelectBuffer) {
-			if(mSelected){
-				GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
+		if(mSelected){
+			GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
+		}
+		else{
+			if(!mGrow){
+				GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+			}
+			else if (mGender == Gender.MALE) {
+				GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
 			}
 			else{
-				if(!mGrow){
-					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-				}
-				else if (mGender == Gender.MALE) {
-					GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
-				}
-				else{
-					GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
-				}
+				GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
 			}
-			mSelectBuffer = selected;
 		}
 	}
 	
