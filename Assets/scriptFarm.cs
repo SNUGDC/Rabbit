@@ -5,7 +5,7 @@ using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
-	enum GameState{GAME, DICT, HELP};
+	enum GameState {GAME, DICT, HELP};
 	
 	public static GameObject objRabbit;
 	public static GameObject objCarrot;
@@ -24,11 +24,6 @@ public class scriptFarm : MonoBehaviour {
 			return mCarrotList;
 		}
 	}
-	public static List<Rabbit> rabbitList{
-		get{
-			return mRabbitList;
-		}
-	}
 	public static Rabbit targetBuffer{
 		get{
 			return mTargetBuffer;
@@ -41,7 +36,6 @@ public class scriptFarm : MonoBehaviour {
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
 	private static List<Carrot> mCarrotList = new List<Carrot>();
-	private static List<Rabbit> mRabbitList = new List<Rabbit>();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
@@ -52,7 +46,7 @@ public class scriptFarm : MonoBehaviour {
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
 		objCarrot = (GameObject)Resources.Load("prefabCarrot");
-		Rabbit.initRabbit();
+		Rabbit.init();
 		FarmFunc.init();
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
@@ -60,13 +54,6 @@ public class scriptFarm : MonoBehaviour {
 		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
-		InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
-	}
-	
-	void IncreaseHunger(){
-		foreach(Rabbit element in mRabbitList){
-			++(element.hunger);
-		}
 	}
 	
 	void Update () {
@@ -86,7 +73,7 @@ public class scriptFarm : MonoBehaviour {
 				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
 				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
 					//in trash area
-					mRabbitList.Remove(mTargetRabbit);
+					Rabbit.rabbitList.Remove(mTargetRabbit);
 					DestroyImmediate (mTargetRabbit.gameObject);
 					mMoney += 200;
 				}
@@ -95,10 +82,10 @@ public class scriptFarm : MonoBehaviour {
 					//found rabbit with different gender
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
-							mRabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
+							Rabbit.rabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
 						}
 						else{
-							mRabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
+							Rabbit.rabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
 						}
 						mMoney -= 100;
 					}
@@ -107,6 +94,7 @@ public class scriptFarm : MonoBehaviour {
 			}
 		}
 	}
+
 	void OnGUI(){
 		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString());
 		//money - text
@@ -134,7 +122,7 @@ public class scriptFarm : MonoBehaviour {
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
 			//buy button
 			if(mMoney >= 200 || mTestMode){
-				mRabbitList.Add(FarmFunc.createRabbit(null, null));
+				Rabbit.rabbitList.Add(FarmFunc.createRabbit(null, null));
 				mMoney -= 200;
 			}
 		}

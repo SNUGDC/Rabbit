@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 public class Rabbit : MonoBehaviour {
 	
+	public enum Gender {MALE, FEMALE};
 	
-	public enum Gender{MALE, FEMALE};
-	
-	public static readonly ulong startHunger = 15;
-	public static readonly ulong maxHunger = 50;
-	public static ulong rabbitCounter = 0;
+	public static List<Rabbit> rabbitList = new List<Rabbit>();
+	public static readonly ulong startHunger = 200;
+	public static readonly ulong maxHunger = 1000;
 	public static Sprite sprMaleRabbitStand;
 	public static Sprite sprFemaleRabbitStand;
 	public static Sprite sprRabbitHold;
@@ -40,7 +39,15 @@ public class Rabbit : MonoBehaviour {
 			mHunger = value;
 		}
 	}
-	public ulong rabbitId{
+	public ulong life{
+		get{
+			return mLife;
+		}
+		set{
+			mLife = value;
+		}
+	}
+	public int rabbitId{
 		get{
 			return mRabbitId;
 		}
@@ -61,14 +68,15 @@ public class Rabbit : MonoBehaviour {
 	private bool mSelectBuffer = false;
 	private int mJumpCounter = 0;
 	private ulong mHunger;
-	private ulong mRabbitId;
+	private ulong mLife;
+	private int mRabbitId;
 	private float mJumpRate = 0.4f;
 	private Vector3 mMovingDir;
 	private Gender mGender;
 	private Color mColor;
 	private List<Gene> mGeneList = new List<Gene>();
 	
-	public static void initRabbit(){
+	public static void init(){
 		sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
 		sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
 		sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
@@ -81,7 +89,7 @@ public class Rabbit : MonoBehaviour {
 	
 	// Use this for initialization
 	IEnumerator Start () {
-		mRabbitId = ++rabbitCounter;
+		mRabbitId = rabbitList.Count;
 		if (Random.Range(0, 2) == 0) {
 			mGender = Gender.MALE;
 		}
@@ -91,11 +99,13 @@ public class Rabbit : MonoBehaviour {
 		mColor = new Color(1, 1, 1);
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 		mHunger = 0;
+		//InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
 		yield return StartCoroutine("RabbitJump");
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		++mHunger;
 		if (mSelected != mSelectBuffer) {
 			if(mSelected){
 				GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
@@ -182,7 +192,7 @@ public class Rabbit : MonoBehaviour {
 			}
 			yield return new WaitForSeconds(mJumpRate);
 		}
-		scriptFarm.rabbitList.Remove(this);
+		rabbitList.Remove(this);
 		Destroy(gameObject);
 		yield break;
 	}
