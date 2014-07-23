@@ -91,13 +91,13 @@ public class Rabbit : MonoBehaviour {
 		mRabbitId = rabbitList.Count;
 		mGender = (Random.Range(0, 2) == 0) ? Gender.MALE : Gender.FEMALE;
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-		//InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
 		yield return StartCoroutine("RabbitJump");
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		++mHunger;
+		//set sprite
 		if(mSelected){
 			GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
 		}
@@ -105,11 +105,8 @@ public class Rabbit : MonoBehaviour {
 			if(!mGrow){
 				GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 			}
-			else if (mGender == Gender.MALE) {
-				GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
-			}
 			else{
-				GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
+				GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
 			}
 		}
 	}
@@ -123,16 +120,19 @@ public class Rabbit : MonoBehaviour {
 			if (!selected) {
 				switch(mJumpCounter){
 				case 4 :
+					//find Carrot
 					Carrot nearCarrot = FarmFunc.findNearCarrot(transform.position.x, transform.position.y);
+					//set new MovingDir
 					if(nearCarrot && mHunger > startHunger){
 						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
 						                          nearCarrot.gameObject.transform.position.y - transform.position.y);
 						mMovingDir.Normalize();
-						mMovingDir = mMovingDir * 10;
+						mMovingDir *= 10;
 					}
 					else{
 						mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
 					}
+					//boundary check
 					Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 					Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
 					if(mMovingDir.x + transform.position.x < maxLeftBottom.x || mMovingDir.x + transform.position.x > maxRightTop.x){
@@ -141,9 +141,11 @@ public class Rabbit : MonoBehaviour {
 					if(mMovingDir.y + transform.position.y < maxLeftBottom.y || mMovingDir.y + transform.position.y > maxRightTop.y){
 						mMovingDir.y *= -1;
 					}
+					//move position
 					transform.position = new Vector3(transform.position.x + mMovingDir.x / 2,
 					                                 transform.position.y +  mMovingDir.y / 2,
 					                                 0);
+					//change sprite
 					if(mGrow){
 						GetComponent<SpriteRenderer> ().sprite = sprRabbitJump;
 					}
@@ -166,11 +168,8 @@ public class Rabbit : MonoBehaviour {
 					if(!mGrow){
 						GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 					}
-					else if (mGender == Gender.MALE) {
-						GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
-					}
-					else {
-						GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
+					else{
+						GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
 					}
 					break;
 				}
@@ -189,18 +188,11 @@ public class Rabbit : MonoBehaviour {
 	void OnMouseDrag(){
 		if (selected) {
 			Vector2 temp = Input.mousePosition;
-			if(temp.x < 0){
-				temp.x = 0;
-			}
-			else if(temp.x > scriptFarm.sWidth * 0.9f){
-				temp.x = scriptFarm.sWidth * 0.9f;
-			}
-			if(temp.y < 0){
-				temp.y = 0;
-			}
-			else if(temp.y > scriptFarm.sHeight * 0.9f){
-				temp.y = scriptFarm.sHeight * 0.9f;
-			}
+			//limit draggable area
+			temp.x = Mathf.Max(temp.x, 0);
+			temp.x = Mathf.Min(temp.x, scriptFarm.sWidth * 0.9f);
+			temp.y = Mathf.Max(temp.y, 0);
+			temp.y = Mathf.Min(temp.y, scriptFarm.sHeight * 0.9f);
 			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
 		}
 	}
