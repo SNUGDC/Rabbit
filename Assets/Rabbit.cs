@@ -85,6 +85,11 @@ public class Rabbit : MonoBehaviour {
 		sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
 		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
 	}
+
+	public static void delete(Rabbit target){
+		rabbitList.Remove(target);
+		DestroyImmediate(target.gameObject);
+	}
 	
 	// Use this for initialization
 	void Start () {
@@ -95,16 +100,15 @@ public class Rabbit : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(++mHunger > startHunger){
+		if(++mHunger > maxHunger){
+			//rabbit starved to death
+			Rabbit.delete(this);
+			return;
+		}
+		if(mHunger > startHunger){
 			//rabbit is hungry
 			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
 			mJumpPeriod = 5;
-		}
-		else if(mHunger > maxHunger){
-			//rabbit starved to death
-			rabbitList.Remove(this);
-			Destroy(gameObject);
-			return;
 		}
 		//Rabbit Jump Loop
 		if (!mSelected) {
