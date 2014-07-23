@@ -5,7 +5,7 @@ using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
-	enum GameState {GAME, DICT, HELP};
+	public enum GameState {GAME, DICT, HELP};
 	
 	public static GameObject objRabbit;
 	public static GameObject objCarrot;
@@ -24,11 +24,6 @@ public class scriptFarm : MonoBehaviour {
 			return mCarrotList;
 		}
 	}
-	public static Rabbit targetBuffer{
-		get{
-			return mTargetBuffer;
-		}
-	}
 	
 	private static bool mTestMode = false;
 	private static bool mShowPopup = false;
@@ -41,7 +36,6 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static GameState mCurState = GameState.GAME;
 	private static Rabbit mTargetRabbit = null;
-	private static Rabbit mTargetBuffer = null;
 	
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
@@ -60,7 +54,6 @@ public class scriptFarm : MonoBehaviour {
 		if(Input.GetMouseButtonDown(0)){
 			mTargetRabbit = FarmFunc.selectRabbit();
 			mShowPopup = (mTargetRabbit != null);
-			mTargetBuffer = mTargetRabbit;
 		}
 		if(Input.GetMouseButtonDown(1)){
 			if(Input.mousePosition.x <= mSWidth * 0.9f && Input.mousePosition.y <= mSHeight * 0.9f){
@@ -90,7 +83,6 @@ public class scriptFarm : MonoBehaviour {
 						mMoney -= 100;
 					}
 				}
-				mTargetRabbit = null;
 			}
 		}
 	}
@@ -149,16 +141,16 @@ public class scriptFarm : MonoBehaviour {
 		if(mShowPopup){
 			//popup
 			string popupText = "";
-			popupText += ("ID : " + mTargetBuffer.id + "\n");
+			popupText += ("ID : " + mTargetRabbit.id + "\n");
 			popupText += ("name : (none)\n");
-			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
-			popupText += ("gender : " + (mTargetBuffer.grow ? mTargetBuffer.gender.ToString() : "???") + "\n");
-			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
-				popupText += mTargetBuffer.geneList[i].name + " : ";
-				if(mTargetBuffer.grow){
-					for(int j = 0; j < mTargetBuffer.geneList[i].factor.GetLength(0); ++j){
-						for(int k = 0; k < mTargetBuffer.geneList[i].factor.GetLength(1); ++k){
-							popupText += mTargetBuffer.geneList[i].factor[j, k];
+			popupText += ("hunger : " + ((mTargetRabbit.hunger != Rabbit.maxHunger + 1) ? mTargetRabbit.hunger.ToString() : "dead") + "\n");
+			popupText += ("gender : " + (mTargetRabbit.grow ? mTargetRabbit.gender.ToString() : "???") + "\n");
+			for(int i = 0; i < mTargetRabbit.geneList.Count; ++i){
+				popupText += mTargetRabbit.geneList[i].name + " : ";
+				if(mTargetRabbit.grow){
+					for(int j = 0; j < mTargetRabbit.geneList[i].factor.GetLength(0); ++j){
+						for(int k = 0; k < mTargetRabbit.geneList[i].factor.GetLength(1); ++k){
+							popupText += mTargetRabbit.geneList[i].factor[j, k];
 						}
 						popupText += ", ";
 					}

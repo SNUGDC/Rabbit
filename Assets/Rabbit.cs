@@ -96,13 +96,17 @@ public class Rabbit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(++mHunger > startHunger){
+			//rabbit is hungry
 			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
-			mJumpPeriod = 10;
+			mJumpPeriod = 5;
 		}
 		else if(mHunger > maxHunger){
+			//rabbit starved to death
 			rabbitList.Remove(this);
 			Destroy(gameObject);
+			return;
 		}
+		//Rabbit Jump Loop
 		if (!mSelected) {
 			if(mFrameCounter == 0){
 				if(!mGrow){
@@ -173,6 +177,7 @@ public class Rabbit : MonoBehaviour {
 				mGrow = true;
 				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, float arg2){return arg1 / arg2;});
 			}
+			mFrameCounter = 0;
 			renderer.material.color = mColor;
 		}
 	}
