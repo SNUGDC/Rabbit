@@ -149,7 +149,7 @@ public class scriptFarm : MonoBehaviour {
 		if(mShowPopup){
 			//popup
 			string popupText = "";
-			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
+			popupText += ("ID : " + mTargetBuffer.id + "\n");
 			popupText += ("name : (none)\n");
 			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
 			popupText += ("gender : " + (mTargetBuffer.grow ? mTargetBuffer.gender.ToString() : "???") + "\n");
