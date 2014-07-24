@@ -129,16 +129,6 @@ public class Rabbit : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
-		if(++mHunger > maxHunger){
-			// rabbit starved to death
-			Rabbit.delete(this);
-			return;
-		}
-		if(mHunger > startHunger){
-			// rabbit is hungry
-			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
-			mJumpPeriod = 5;
-		}
 		// Rabbit Jump Loop
 		if (!mSelected) {
 			if(mFrameCounter == 0){
@@ -150,18 +140,7 @@ public class Rabbit : MonoBehaviour {
 				}
 			}
 			else if(mFrameCounter == mJumpPeriod * 4){
-				// find Carrot
-				Carrot nearCarrot = FarmFunc.findNearCarrot(transform.position.x, transform.position.y);
-				// set new MovingDir
-				if(nearCarrot && mHunger > startHunger){
-					mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
-					                          nearCarrot.gameObject.transform.position.y - transform.position.y);
-					mMovingDir.Normalize();
-					mMovingDir *= 10;
-				}
-				else{
-					mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
-				}
+				mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
 				// boundary check
 				Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 				Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
