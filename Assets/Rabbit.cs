@@ -9,8 +9,7 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
-	public static readonly ulong startHunger = 200; // starting point of hungry state
-	public static readonly ulong maxHunger = 1000; // hunger for starving to death
+	public static readonly uint maxLife = 5000;
 	public static Sprite sprMaleRabbitStand;
 	public static Sprite sprFemaleRabbitStand;
 	public static Sprite sprRabbitHold;
@@ -62,7 +61,7 @@ public class Rabbit : MonoBehaviour {
 	private bool mIsAdult = false;
 	private bool mSelected = false;
 	private uint mFrameCounter = 0; // for Jump Loop
-	private ulong mLife;
+	private ulong mLife = maxLife;
 	private int mId;
 	private uint mJumpPeriod = 15; // for Jump Loop
 	private Vector3 mMovingDir; // for Jump Loop
@@ -121,6 +120,10 @@ public class Rabbit : MonoBehaviour {
 	// Update is called once per frame
 	void Update() {
 		// Rabbit Jump Loop
+		if(--mLife <= 0){
+			delete(this);
+			return;
+		}
 		if (!mSelected) {
 			// decide movingDir
 			if(mFrameCounter == mJumpPeriod * 4){

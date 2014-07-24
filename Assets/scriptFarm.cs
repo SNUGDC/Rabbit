@@ -156,6 +156,7 @@ public class scriptFarm : MonoBehaviour {
 			// basic information
 			popupText += ("ID : " + mTargetRabbit.id + "\n");
 			popupText += ("name : (none)\n");
+			popupText += ("life : " + mTargetRabbit.life + "\n");
 			popupText += ("gender : " + (mTargetRabbit.isAdult ? mTargetRabbit.gender.ToString() : "???") + "\n");
 			// add all gene's text in geneList
 			for(int i = 0; i < mTargetRabbit.geneList.Count; ++i){
