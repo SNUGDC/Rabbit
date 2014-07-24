@@ -78,10 +78,10 @@ public class scriptFarm : MonoBehaviour {
 					 && anotherRabbit.grow && mTargetRabbit.grow){
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
-							Rabbit.rabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
+							Rabbit.create(anotherRabbit, mTargetRabbit);
 						}
 						else{
-							Rabbit.rabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
+							Rabbit.create(mTargetRabbit, anotherRabbit);
 						}
 						mMoney -= 100;
 					}
@@ -116,7 +116,7 @@ public class scriptFarm : MonoBehaviour {
 		//buy button
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
 			if(mMoney >= 200 || mTestMode){
-				Rabbit.rabbitList.Add(FarmFunc.createRabbit(null, null));
+				Rabbit.create(null, null);
 				mMoney -= 200;
 			}
 		}

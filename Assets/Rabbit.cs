@@ -86,6 +86,28 @@ public class Rabbit : MonoBehaviour {
 		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
 	}
 
+	public static void create(Rabbit father, Rabbit mother){
+		// select position of new rabbit
+		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
+		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
+		// assign genes to newRabbit
+		if(father == null || mother == null){
+			foreach(JsonGene element in Gene.jsonGeneList){
+				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
+			}
+		}
+		else{
+			for(int i = 0; i < father.geneList.Count; ++i){
+				newRabbit.GetComponent<Rabbit>().geneList.Add(new Gene(father.geneList[i], mother.geneList[i]));
+			}
+		}
+		// add newRabbit to rabbitList
+		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
+	}
+
 	public static void delete(Rabbit target){
 		rabbitList.Remove(target);
 		DestroyImmediate(target.gameObject);

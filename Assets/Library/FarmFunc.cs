@@ -5,20 +5,18 @@ using System.Collections.Generic;
 
 // Gene = factor + factor
 
+// reference data of Gene class
+public struct JsonGene{
+	public string name; // name of gene
+	public string[][] factorList; // list of factors
+								  // 1st index : dominancy(priority of factor)
+	public uint numDominant; // number of multi-dominant genes
+	public object[][][] factorHashTable; // table of combination of factors
+										 // 1st index : dominancy
+										 // 2nd, 3rd index : index of factors
+}
 
 public class Gene{
-	/*-----public data type-----*/
-	// reference data of Gene class
-	public struct JsonGene{
-		public string name; // name of gene
-		public string[][] factorList; // list of factors
-									  // 1st index : dominancy(priority of factor)
-		public uint numDominant; // number of multi-dominant genes
-		public object[][][] factorHashTable; // table of combination of factors
-											 // 1st index : dominancy
-											 // 2nd, 3rd index : index of factors
-	}
-
 	/*-----public static variable-----*/
 	public static List<JsonGene> jsonGeneList = new List<JsonGene>();
 
@@ -37,9 +35,11 @@ public class Gene{
 
 	/*-----public static function-----*/
 	public static void init(){
+		// initialize
 		jsonGeneList.Clear();
 		System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("GeneFile").text);
 		string read = null, json = null;
+		// read each JsonGene from GeneFile
 		while(inFile.Peek() >= 0){
 			do{
 				read = inFile.ReadLine();
@@ -49,6 +49,7 @@ public class Gene{
 			json = null;
 		}
 		inFile.Close ();
+		// set factorHashTable of each JsonGene
 		foreach(JsonGene element in jsonGeneList){
 			switch(element.name){
 				case "size" :
@@ -211,8 +212,15 @@ public class Gene{
 	public T Phenotype<T>(T baseObject, System.Func<T, T, T> Add, System.Func<T, int, T> Divide){
 		T result = baseObject;
 		for(int i = 0; i < factor.GetLength(0); ++i){
+			//check dominancy
 			if(factorIndex[i, 0, 0] == factorIndex[i, 1, 0]){
 				result = Add(result, (T)(originalGene.factorHashTable[factorIndex[i, 0, 0]][factorIndex[i, 0, 1]][factorIndex[i, 1, 1]]));
+			}
+			else if(factorIndex[i, 0, 0] > factorIndex[i, 1, 0]){
+				result = Add(result, (T)(originalGene.factorHashTable[factorIndex[i, 1, 0]][factorIndex[i, 1, 1]][factorIndex[i, 1, 1]]));
+			}
+			else{
+				result = Add(result, (T)(originalGene.factorHashTable[factorIndex[i, 0, 0]][factorIndex[i, 0, 1]][factorIndex[i, 0, 1]]));
 			}
 		}
 		result = Divide(result, (int)(factor.GetLength(0)));
@@ -257,25 +265,6 @@ public class FarmFunc : MonoBehaviour {
 			}
 		}
 		return result;
-	}
-	
-	public static Rabbit createRabbit(Rabbit father, Rabbit mother){
-		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
-		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
-		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
-		if(father == null || mother == null){
-			foreach(JsonGene element in jsonGeneList){
-				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
-			}
-		}
-		else{
-			for(int i = 0; i < father.geneList.Count; ++i){
-				newRabbit.GetComponent<Rabbit>().geneList.Add(new Gene(father.geneList[i], mother.geneList[i]));
-			}
-		}
-		return newRabbit.GetComponent<Rabbit>();
 	}
 	
 	public static Carrot createCarrot(float x, float y){
