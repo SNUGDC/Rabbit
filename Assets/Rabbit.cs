@@ -122,15 +122,8 @@ public class Rabbit : MonoBehaviour {
 	void Update() {
 		// Rabbit Jump Loop
 		if (!mSelected) {
-			if(mFrameCounter == 0){
-				if(!mIsAdult){
-					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-				}
-				else{
-					GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
-				}
-			}
-			else if(mFrameCounter == mJumpPeriod * 4){
+			// decide movingDir
+			if(mFrameCounter == mJumpPeriod * 4){
 				mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
 				// boundary check
 				Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
@@ -143,11 +136,23 @@ public class Rabbit : MonoBehaviour {
 				}
 				// move position
 				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
-				// change sprite
-				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitJump : sprSmallJump;
 			}
 			else if(mFrameCounter == mJumpPeriod * 5){
 				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
+			}
+			// change sprite
+			if(0 <= mFrameCounter && mFrameCounter < mJumpPeriod * 4){
+				if(!mIsAdult){
+					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+				}
+				else{
+					GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
+				}
+			}
+			else if(mJumpPeriod * 4 <= mFrameCounter && mFrameCounter < mJumpPeriod * 5){
+				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitJump : sprSmallJump;
+			}
+			else if(mJumpPeriod * 5 <= mFrameCounter && mFrameCounter < mJumpPeriod * 6){
 				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitLand : sprSmallLand;
 			}
 			mFrameCounter = (mFrameCounter + 1) % (mJumpPeriod * 6);
