@@ -5,8 +5,10 @@ using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
-	enum GameState {GAME, DICT, HELP};
+	/*-----public data types-----*/
+	public enum GameState {GAME, DICT, HELP};
 	
+	/*-----public static variables-----*/
 	public static GameObject objRabbit;
 	public static GameObject objCarrot;
 	public static int sWidth{
@@ -24,12 +26,8 @@ public class scriptFarm : MonoBehaviour {
 			return mCarrotList;
 		}
 	}
-	public static Rabbit targetBuffer{
-		get{
-			return mTargetBuffer;
-		}
-	}
 	
+	/*-----private static variables-----*/
 	private static bool mTestMode = false;
 	private static bool mShowPopup = false;
 	private static int mMoney = 1100;
@@ -41,13 +39,30 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static GameState mCurState = GameState.GAME;
 	private static Rabbit mTargetRabbit = null;
-	private static Rabbit mTargetBuffer = null;
 	
+	/*-----public static functions-----*/
+	// find gameobject at mouse position with condition
+	public static GameObject clickedObject(string tag, System.Func<GameObject, bool> condition){
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
+		GameObject result = null;
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.tag == tag && condition(element.collider.gameObject)){
+				result = element.collider.gameObject;
+				break;
+			}
+		}
+		return result;
+	}
+
+	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
 		objCarrot = (GameObject)Resources.Load("prefabCarrot");
+		// class init
 		Rabbit.init();
-		FarmFunc.init();
+		Gene.init();
+		// style init
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mHelpStyle.fontSize = 50;
@@ -58,11 +73,16 @@ public class scriptFarm : MonoBehaviour {
 	
 	void Update () {
 		if(Input.GetMouseButtonDown(0)){
-			mTargetRabbit = FarmFunc.selectRabbit();
+			// select rabbit
+			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
+			if(clicked != null){
+				mTargetRabbit = clicked.GetComponent<Rabbit>();
+				mTargetRabbit.selected = true;
+			}
 			mShowPopup = (mTargetRabbit != null);
-			mTargetBuffer = mTargetRabbit;
 		}
 		if(Input.GetMouseButtonDown(1)){
+			// create carrot
 			if(Input.mousePosition.x <= mSWidth * 0.9f && Input.mousePosition.y <= mSHeight * 0.9f){
 				mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
 			}
@@ -70,106 +90,109 @@ public class scriptFarm : MonoBehaviour {
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
 				mTargetRabbit.selected = false;
-				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
+				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
+				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
+				// in trash area
 				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
-					//in trash area
-					Rabbit.rabbitList.Remove(mTargetRabbit);
-					DestroyImmediate (mTargetRabbit.gameObject);
+					Rabbit.delete(mTargetRabbit);
 					mMoney += 200;
 				}
+				// found rabbit with different gender & both are grown
 				else if(anotherRabbit != null && anotherRabbit.gender != mTargetRabbit.gender
 					 && anotherRabbit.grow && mTargetRabbit.grow){
-					//found rabbit with different gender
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
-							Rabbit.rabbitList.Add (FarmFunc.createRabbit(anotherRabbit, mTargetRabbit));
+							Rabbit.create(anotherRabbit, mTargetRabbit);
 						}
 						else{
-							Rabbit.rabbitList.Add(FarmFunc.createRabbit(mTargetRabbit, anotherRabbit));
+							Rabbit.create(mTargetRabbit, anotherRabbit);
 						}
 						mMoney -= 100;
 					}
 				}
-				mTargetRabbit = null;
 			}
 		}
 	}
 
 	void OnGUI(){
+		// money - text
 		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString());
-		//money - text
+		// test mode - text
 		if(mTestMode){
 			GUI.Label (new Rect(mSWidth * 0.05f, mSHeight * 0.16f, mSWidth * 0.1f, mSHeight * 0.1f), "test mode");
-			//test mode - text
 		}
+		// trash
 		GUI.Label (new Rect (mSWidth * 0.9f, mSHeight * 0.9f, mSWidth * 0.1f, mSHeight * 0.1f), "trash", mPopupStyle);
-		//trash
-
+		// return button	
 		if (GUI.Button (new Rect (mSWidth * 0.0f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Return") && (mCurState == GameState.GAME)) {
-			//return button	
 			Application.LoadLevel("sceneMainMenu");
 		}
+		// dict button
 		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == GameState.GAME)) {
-			//dict button
 			mCurState = GameState.DICT;
 			Time.timeScale = 0; // stop game time
 		}
+		// help button
 		if (GUI.Button (new Rect (mSWidth * 0.2f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Help") && (mCurState == GameState.GAME)) {
-			//help button
 			mCurState = GameState.HELP;
 			Time.timeScale = 0; // stop game time
 		}
+		// buy button
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
-			//buy button
 			if(mMoney >= 200 || mTestMode){
-				Rabbit.rabbitList.Add(FarmFunc.createRabbit(null, null));
+				Rabbit.create(null, null);
 				mMoney -= 200;
 			}
 		}
+		// test mode button
 		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == GameState.GAME)){
-			//test mode button
 			mTestMode = !mTestMode;
 		}
+		// in dict mode
 		if (mCurState == GameState.DICT) {
-			//in dict mode
 			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Dictionary", mDictStyle);
 			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
 				mCurState = GameState.GAME;
 				Time.timeScale = 1; // resume game
 			}
 		}
+		// in help mode
 		else if (mCurState == GameState.HELP) {
-			//in help mode
 			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Help", mHelpStyle);
 			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
 				mCurState = GameState.GAME;
 				Time.timeScale = 1; // resume game
 			}
 		}
+		// popup
 		if(mShowPopup){
-			//popup
 			string popupText = "";
-			popupText += ("ID : " + mTargetBuffer.rabbitId + "\n");
+			// basic information
+			popupText += ("ID : " + mTargetRabbit.id + "\n");
 			popupText += ("name : (none)\n");
-			popupText += ("hunger : " + ((mTargetBuffer.hunger != Rabbit.maxHunger + 1) ? mTargetBuffer.hunger.ToString() : "dead") + "\n");
-			popupText += ("gender : " + (mTargetBuffer.grow ? mTargetBuffer.gender.ToString() : "???") + "\n");
-			for(int i = 0; i < mTargetBuffer.geneList.Count; ++i){
-				popupText += mTargetBuffer.geneList[i].name + " : ";
-				if(mTargetBuffer.grow){
-					for(int j = 0; j < mTargetBuffer.geneList[i].factor.GetLength(0); ++j){
-						for(int k = 0; k < mTargetBuffer.geneList[i].factor.GetLength(1); ++k){
-							popupText += mTargetBuffer.geneList[i].factor[j, k];
+			popupText += ("hunger : " + ((mTargetRabbit.hunger != Rabbit.maxHunger + 1) ? mTargetRabbit.hunger.ToString() : "dead") + "\n");
+			popupText += ("gender : " + (mTargetRabbit.grow ? mTargetRabbit.gender.ToString() : "???") + "\n");
+			// add all gene's text in geneList
+			for(int i = 0; i < mTargetRabbit.geneList.Count; ++i){
+				popupText += mTargetRabbit.geneList[i].name + " : ";
+				if(mTargetRabbit.grow){
+					for(int j = 0; j < mTargetRabbit.geneList[i].factor.GetLength(0); ++j){
+						for(int k = 0; k < mTargetRabbit.geneList[i].factor.GetLength(1); ++k){
+							popupText += mTargetRabbit.geneList[i].factor[j, k];
 						}
 						popupText += ", ";
 					}
+					// remove last comma
 					popupText = popupText.Remove(popupText.Length - 2, 2);
 				}
+				// don't show genes when rabbit is not grown
 				else{
 					popupText += "???";
 				}
 				popupText += "\n";
 			}
 			GUI.Label (new Rect(mSWidth * 0.75f, mSHeight * 0.0f, mSWidth * 0.25f, mSHeight * 0.5f), popupText, mPopupStyle);
+			// popup close button
 			if(GUI.Button (new Rect(mSWidth * 0.925f, mSHeight * 0.025f, mSWidth * 0.05f, mSHeight * 0.05f), "close")){
 				mShowPopup = false;
 			}

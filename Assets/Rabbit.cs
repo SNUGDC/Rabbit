@@ -4,11 +4,13 @@ using System.Collections.Generic;
 
 public class Rabbit : MonoBehaviour {
 	
+	/*-----public data types-----*/
 	public enum Gender {MALE, FEMALE};
 	
+	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
-	public static readonly ulong startHunger = 200;
-	public static readonly ulong maxHunger = 1000;
+	public static readonly ulong startHunger = 200; // starting point of hungry state
+	public static readonly ulong maxHunger = 1000; // hunger for starving to death
 	public static Sprite sprMaleRabbitStand;
 	public static Sprite sprFemaleRabbitStand;
 	public static Sprite sprRabbitHold;
@@ -18,6 +20,7 @@ public class Rabbit : MonoBehaviour {
 	public static Sprite sprSmallJump;
 	public static Sprite sprSmallLand;
 	
+	/*-----public member variables-----*/
 	public bool grow{
 		get{
 			return mGrow;
@@ -47,9 +50,9 @@ public class Rabbit : MonoBehaviour {
 			mLife = value;
 		}
 	}
-	public int rabbitId{
+	public int id{
 		get{
-			return mRabbitId;
+			return mId;
 		}
 	}
 	public Gender gender{
@@ -63,19 +66,20 @@ public class Rabbit : MonoBehaviour {
 		}
 	}
 	
+	/*-----private member variables-----*/
 	private bool mGrow = false;
 	private bool mSelected = false;
-	private bool mSelectBuffer = false;
-	private int mJumpCounter = 0;
-	private ulong mHunger;
+	private uint mFrameCounter = 0; // for Jump Loop
+	private ulong mHunger = 0;
 	private ulong mLife;
-	private int mRabbitId;
-	private float mJumpRate = 0.4f;
-	private Vector3 mMovingDir;
+	private int mId;
+	private uint mJumpPeriod = 15; // for Jump Loop
+	private Vector3 mMovingDir; // for Jump Loop
 	private Gender mGender;
-	private Color mColor;
+	private Color mColor = new Color(1, 1, 1);
 	private List<Gene> mGeneList = new List<Gene>();
 	
+	/*-----public static functions-----*/
 	public static void init(){
 		sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
 		sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
@@ -86,146 +90,128 @@ public class Rabbit : MonoBehaviour {
 		sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
 		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
 	}
-	
-	// Use this for initialization
-	IEnumerator Start () {
-		mRabbitId = rabbitList.Count;
-		if (Random.Range(0, 2) == 0) {
-			mGender = Gender.MALE;
+
+	public static void create(Rabbit father, Rabbit mother){
+		// select position of new rabbit
+		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
+		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
+		// assign genes to newRabbit
+		if(father == null || mother == null){
+			foreach(JsonGene element in Gene.jsonGeneList){
+				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
+			}
 		}
 		else{
-			mGender = Gender.FEMALE;
+			for(int i = 0; i < father.geneList.Count; ++i){
+				newRabbit.GetComponent<Rabbit>().geneList.Add(new Gene(father.geneList[i], mother.geneList[i]));
+			}
 		}
-		mColor = new Color(1, 1, 1);
+		// add newRabbit to rabbitList
+		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
+	}
+
+	public static void delete(Rabbit target){
+		rabbitList.Remove(target);
+		DestroyImmediate(target.gameObject);
+	}
+	
+	/*-----public member functions-----*/
+	// Use this for initialization
+	void Start () {
+		mId = rabbitList.Count;
+		mGender = (Random.Range(0, 2) == 0) ? Gender.MALE : Gender.FEMALE;
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-		mHunger = 0;
-		//InvokeRepeating("IncreaseHunger", 0.4f, 0.4f);
-		yield return StartCoroutine("RabbitJump");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		++mHunger;
-		if (mSelected != mSelectBuffer) {
-			if(mSelected){
-				GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
-			}
-			else{
+		if(++mHunger > maxHunger){
+			// rabbit starved to death
+			Rabbit.delete(this);
+			return;
+		}
+		if(mHunger > startHunger){
+			// rabbit is hungry
+			renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
+			mJumpPeriod = 5;
+		}
+		// Rabbit Jump Loop
+		if (!mSelected) {
+			if(mFrameCounter == 0){
 				if(!mGrow){
 					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 				}
-				else if (mGender == Gender.MALE) {
-					GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
+				else{
+					GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
+				}
+			}
+			else if(mFrameCounter == mJumpPeriod * 4){
+				// find Carrot
+				Carrot nearCarrot = FarmFunc.findNearCarrot(transform.position.x, transform.position.y);
+				// set new MovingDir
+				if(nearCarrot && mHunger > startHunger){
+					mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
+					                          nearCarrot.gameObject.transform.position.y - transform.position.y);
+					mMovingDir.Normalize();
+					mMovingDir *= 10;
 				}
 				else{
-					GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
+					mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
 				}
-			}
-			mSelectBuffer = selected;
-		}
-	}
-	
-	IEnumerator RabbitJump(){
-		while(mHunger <= maxHunger){
-			if(mHunger > startHunger){
-				renderer.material.color = new Color(0.192f, 0.376f, 0.2f);
-				mJumpRate = 0.1f;
-			}			
-			if (!selected) {
-				switch(mJumpCounter){
-				case 4 :
-					Carrot nearCarrot = FarmFunc.findNearCarrot(transform.position.x, transform.position.y);
-					if(nearCarrot && mHunger > startHunger){
-						mMovingDir = new Vector3 (nearCarrot.gameObject.transform.position.x - transform.position.x,
-						                          nearCarrot.gameObject.transform.position.y - transform.position.y);
-						mMovingDir.Normalize();
-						mMovingDir = mMovingDir * 10;
-					}
-					else{
-						mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
-					}
-					Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-					Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-					if(mMovingDir.x + transform.position.x < maxLeftBottom.x || mMovingDir.x + transform.position.x > maxRightTop.x){
-						mMovingDir.x *= -1;
-					}
-					if(mMovingDir.y + transform.position.y < maxLeftBottom.y || mMovingDir.y + transform.position.y > maxRightTop.y){
-						mMovingDir.y *= -1;
-					}
-					transform.position = new Vector3(transform.position.x + mMovingDir.x / 2,
-					                                 transform.position.y +  mMovingDir.y / 2,
-					                                 0);
-					if(mGrow){
-						GetComponent<SpriteRenderer> ().sprite = sprRabbitJump;
-					}
-					else{
-						GetComponent<SpriteRenderer>().sprite = sprSmallJump;
-					}
-					break;
-				case 5 :
-					transform.position = new Vector3(transform.position.x + mMovingDir.x / 2,
-					                                 transform.position.y +  mMovingDir.y / 2,
-					                                 0);
-					if(mGrow){
-						GetComponent<SpriteRenderer> ().sprite = sprRabbitLand;
-					}
-					else{
-						GetComponent<SpriteRenderer>().sprite = sprSmallLand;
-					}
-					break;
-				default :
-					if(!mGrow){
-						GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-					}
-					else if (mGender == Gender.MALE) {
-						GetComponent<SpriteRenderer> ().sprite = sprMaleRabbitStand;
-					}
-					else {
-						GetComponent<SpriteRenderer> ().sprite = sprFemaleRabbitStand;
-					}
-					break;
+				// boundary check
+				Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+				Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+				if(mMovingDir.x + transform.position.x < maxLeftBottom.x || mMovingDir.x + transform.position.x > maxRightTop.x){
+					mMovingDir.x *= -1;
 				}
-				mJumpCounter = (mJumpCounter + 1) % 6;
+				if(mMovingDir.y + transform.position.y < maxLeftBottom.y || mMovingDir.y + transform.position.y > maxRightTop.y){
+					mMovingDir.y *= -1;
+				}
+				// move position
+				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
+				// change sprite
+				GetComponent<SpriteRenderer>().sprite = (mGrow) ? sprRabbitJump : sprSmallJump;
 			}
-			else{
-				mJumpCounter = 0;
+			else if(mFrameCounter == mJumpPeriod * 5){
+				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
+				GetComponent<SpriteRenderer>().sprite = (mGrow) ? sprRabbitLand : sprSmallLand;
 			}
-			yield return new WaitForSeconds(mJumpRate);
+			mFrameCounter = (mFrameCounter + 1) % (mJumpPeriod * 6);
 		}
-		rabbitList.Remove(this);
-		Destroy(gameObject);
-		yield break;
+		else{
+			GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
+			mFrameCounter = 0;
+		}
 	}
 	
 	void OnMouseDrag(){
 		if (selected) {
 			Vector2 temp = Input.mousePosition;
-			if(temp.x < 0){
-				temp.x = 0;
-			}
-			else if(temp.x > scriptFarm.sWidth * 0.9f){
-				temp.x = scriptFarm.sWidth * 0.9f;
-			}
-			if(temp.y < 0){
-				temp.y = 0;
-			}
-			else if(temp.y > scriptFarm.sHeight * 0.9f){
-				temp.y = scriptFarm.sHeight * 0.9f;
-			}
+			// limit draggable area
+			temp.x = Mathf.Max(temp.x, 0);
+			temp.x = Mathf.Min(temp.x, scriptFarm.sWidth * 0.9f);
+			temp.y = Mathf.Max(temp.y, 0);
+			temp.y = Mathf.Min(temp.y, scriptFarm.sHeight * 0.9f);
 			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
 		}
 	}
 
 	void OnTriggerStay2D(Collider2D collider){
+		// collide with carrot
 		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
 			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
 			Destroy(collider.gameObject);
 			mHunger = 0;
-			mJumpRate = 0.4f;
+			mJumpPeriod = 15;
+			// make rabbit grow
 			if(!mGrow){
 				mGrow = true;
-				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, float arg2){return arg1 / arg2;});
+				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
 			}
+			mFrameCounter = 0;
 			renderer.material.color = mColor;
 		}
 	}
