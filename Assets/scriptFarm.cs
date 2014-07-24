@@ -37,13 +37,27 @@ public class scriptFarm : MonoBehaviour {
 	private static GameState mCurState = GameState.GAME;
 	private static Rabbit mTargetRabbit = null;
 	
+	// find gameobject at mouse position with condition
+	public static GameObject clickedObject(string tag, System.Func<GameObject, bool> condition){
+		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
+		GameObject result = null;
+		foreach(RaycastHit2D element in hit){
+			if(element.collider != null && element.transform.tag == tag && condition(element.collider.gameObject)){
+				result = element.collider.gameObject;
+				break;
+			}
+		}
+		return result;
+	}
+
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
 		objCarrot = (GameObject)Resources.Load("prefabCarrot");
-		//class init
+		// class init
 		Rabbit.init();
 		Gene.init();
-		//style init
+		// style init
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mHelpStyle.fontSize = 50;
@@ -55,7 +69,11 @@ public class scriptFarm : MonoBehaviour {
 	void Update () {
 		if(Input.GetMouseButtonDown(0)){
 			//select rabbit
-			mTargetRabbit = FarmFunc.selectRabbit();
+			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
+			if(clicked != null){
+				mTargetRabbit = clicked.GetComponent<Rabbit>();
+				mTargetRabbit.selected = true;
+			}
 			mShowPopup = (mTargetRabbit != null);
 		}
 		if(Input.GetMouseButtonDown(1)){
@@ -67,7 +85,8 @@ public class scriptFarm : MonoBehaviour {
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
 				mTargetRabbit.selected = false;
-				Rabbit anotherRabbit = FarmFunc.findAnotherRabbit(mTargetRabbit);
+				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
+				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
 				//in trash area
 				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
 					Rabbit.delete(mTargetRabbit);

@@ -239,34 +239,6 @@ public class FarmFunc : MonoBehaviour {
 	void Update () {
 	}
 
-	public static Rabbit selectRabbit(){
-		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
-		Rabbit result = null;
-		foreach(RaycastHit2D element in hit){
-			if(element.collider != null && element.transform.tag == "rabbit"){
-				result = element.transform.GetComponent<Rabbit>();
-				result.selected = true;
-				break;
-			}
-		}
-		return result;
-	}
-	
-	public static Rabbit findAnotherRabbit(Rabbit target){
-		Rabbit result = null;
-		RaycastHit2D[] hit;
-		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		hit = Physics2D.RaycastAll(ray, Vector2.zero);
-		foreach(RaycastHit2D element in hit){
-			if(element.collider != null && element.transform.GetComponent<Rabbit>() != target){
-				result = element.transform.GetComponent<Rabbit>();
-				break;
-			}
-		}
-		return result;
-	}
-	
 	public static Carrot createCarrot(float x, float y){
 		Vector3 tempPosition = Camera.main.ScreenToWorldPoint(new Vector3(x, y, 0));
 		tempPosition.z = 0;
