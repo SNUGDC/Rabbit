@@ -34,14 +34,6 @@ public class Rabbit : MonoBehaviour {
 			mSelected = value;
 		}
 	}
-	public ulong hunger{
-		get{
-			return mHunger;
-		}
-		set{
-			mHunger = value;
-		}
-	}
 	public ulong life{
 		get{
 			return mLife;
@@ -70,7 +62,6 @@ public class Rabbit : MonoBehaviour {
 	private bool mIsAdult = false;
 	private bool mSelected = false;
 	private uint mFrameCounter = 0; // for Jump Loop
-	private ulong mHunger = 0;
 	private ulong mLife;
 	private int mId;
 	private uint mJumpPeriod = 15; // for Jump Loop
