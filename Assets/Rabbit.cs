@@ -21,9 +21,9 @@ public class Rabbit : MonoBehaviour {
 	public static Sprite sprSmallLand;
 	
 	/*-----public member variables-----*/
-	public bool grow{
+	public bool isAdult{
 		get{
-			return mGrow;
+			return mIsAdult;
 		}
 	}
 	public bool selected{
@@ -67,7 +67,7 @@ public class Rabbit : MonoBehaviour {
 	}
 	
 	/*-----private member variables-----*/
-	private bool mGrow = false;
+	private bool mIsAdult = false;
 	private bool mSelected = false;
 	private uint mFrameCounter = 0; // for Jump Loop
 	private ulong mHunger = 0;
@@ -120,14 +120,15 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----public member functions-----*/
 	// Use this for initialization
-	void Start () {
+	void Start() {
 		mId = rabbitList.Count;
 		mGender = (Random.Range(0, 2) == 0) ? Gender.MALE : Gender.FEMALE;
 		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+		Invoke("grow", 5);
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update() {
 		if(++mHunger > maxHunger){
 			// rabbit starved to death
 			Rabbit.delete(this);
@@ -141,7 +142,7 @@ public class Rabbit : MonoBehaviour {
 		// Rabbit Jump Loop
 		if (!mSelected) {
 			if(mFrameCounter == 0){
-				if(!mGrow){
+				if(!mIsAdult){
 					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
 				}
 				else{
@@ -173,11 +174,11 @@ public class Rabbit : MonoBehaviour {
 				// move position
 				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
 				// change sprite
-				GetComponent<SpriteRenderer>().sprite = (mGrow) ? sprRabbitJump : sprSmallJump;
+				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitJump : sprSmallJump;
 			}
 			else if(mFrameCounter == mJumpPeriod * 5){
 				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
-				GetComponent<SpriteRenderer>().sprite = (mGrow) ? sprRabbitLand : sprSmallLand;
+				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitLand : sprSmallLand;
 			}
 			mFrameCounter = (mFrameCounter + 1) % (mJumpPeriod * 6);
 		}
@@ -199,20 +200,9 @@ public class Rabbit : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerStay2D(Collider2D collider){
-		// collide with carrot
-		if(collider.gameObject.tag == "carrot" && !mSelected && mHunger > startHunger){
-			scriptFarm.carrotList.Remove((collider.gameObject.GetComponent<Carrot>()));
-			Destroy(collider.gameObject);
-			mHunger = 0;
-			mJumpPeriod = 15;
-			// make rabbit grow
-			if(!mGrow){
-				mGrow = true;
-				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
-			}
-			mFrameCounter = 0;
-			renderer.material.color = mColor;
-		}
+	void grow(){
+		mIsAdult = true;
+		mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		renderer.material.color = mColor;
 	}
 }

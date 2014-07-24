@@ -99,7 +99,7 @@ public class scriptFarm : MonoBehaviour {
 				}
 				// found rabbit with different gender & both are grown
 				else if(anotherRabbit != null && anotherRabbit.gender != mTargetRabbit.gender
-					 && anotherRabbit.grow && mTargetRabbit.grow){
+					 && anotherRabbit.isAdult && mTargetRabbit.isAdult){
 					if(mMoney >= 100 || mTestMode){
 						if(anotherRabbit.gender == Rabbit.Gender.MALE){
 							Rabbit.create(anotherRabbit, mTargetRabbit);
@@ -171,11 +171,11 @@ public class scriptFarm : MonoBehaviour {
 			popupText += ("ID : " + mTargetRabbit.id + "\n");
 			popupText += ("name : (none)\n");
 			popupText += ("hunger : " + ((mTargetRabbit.hunger != Rabbit.maxHunger + 1) ? mTargetRabbit.hunger.ToString() : "dead") + "\n");
-			popupText += ("gender : " + (mTargetRabbit.grow ? mTargetRabbit.gender.ToString() : "???") + "\n");
+			popupText += ("gender : " + (mTargetRabbit.isAdult ? mTargetRabbit.gender.ToString() : "???") + "\n");
 			// add all gene's text in geneList
 			for(int i = 0; i < mTargetRabbit.geneList.Count; ++i){
 				popupText += mTargetRabbit.geneList[i].name + " : ";
-				if(mTargetRabbit.grow){
+				if(mTargetRabbit.isAdult){
 					for(int j = 0; j < mTargetRabbit.geneList[i].factor.GetLength(0); ++j){
 						for(int k = 0; k < mTargetRabbit.geneList[i].factor.GetLength(1); ++k){
 							popupText += mTargetRabbit.geneList[i].factor[j, k];
