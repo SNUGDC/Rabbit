@@ -10,7 +10,6 @@ public class scriptFarm : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
-	public static GameObject objCarrot;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -21,11 +20,6 @@ public class scriptFarm : MonoBehaviour {
 			return mSHeight;
 		}
 	}
-	public static List<Carrot> carrotList{
-		get{
-			return mCarrotList;
-		}
-	}
 	
 	/*-----private static variables-----*/
 	private static bool mTestMode = false;
@@ -33,7 +27,6 @@ public class scriptFarm : MonoBehaviour {
 	private static int mMoney = 1100;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
-	private static List<Carrot> mCarrotList = new List<Carrot>();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
@@ -58,7 +51,6 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
-		objCarrot = (GameObject)Resources.Load("prefabCarrot");
 		// class init
 		Rabbit.init();
 		Gene.init();
@@ -80,12 +72,6 @@ public class scriptFarm : MonoBehaviour {
 				mTargetRabbit.selected = true;
 			}
 			mShowPopup = (mTargetRabbit != null);
-		}
-		if(Input.GetMouseButtonDown(1)){
-			// create carrot
-			if(Input.mousePosition.x <= mSWidth * 0.9f && Input.mousePosition.y <= mSHeight * 0.9f){
-				mCarrotList.Add(FarmFunc.createCarrot(Input.mousePosition.x, Input.mousePosition.y));
-			}
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
