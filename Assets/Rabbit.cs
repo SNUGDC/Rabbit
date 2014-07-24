@@ -179,7 +179,7 @@ public class Rabbit : MonoBehaviour {
 			mJumpPeriod = 15;
 			if(!mGrow){
 				mGrow = true;
-				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, float arg2){return arg1 / arg2;});
+				mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
 			}
 			mFrameCounter = 0;
 			renderer.material.color = mColor;

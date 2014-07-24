@@ -42,7 +42,7 @@ public class scriptFarm : MonoBehaviour {
 		objCarrot = (GameObject)Resources.Load("prefabCarrot");
 		//class init
 		Rabbit.init();
-		FarmFunc.init();
+		Gene.init();
 		//style init
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);

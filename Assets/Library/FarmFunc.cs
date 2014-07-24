@@ -3,96 +3,39 @@ using LitJson;
 using System.Collections;
 using System.Collections.Generic;
 
-public struct JsonGene{
-	public string name;
-	public string[][] factorList;
-	public uint numDominant;
-	public object[][][] factorHashTable;
-}
+// Gene = factor + factor
 
-public struct Gene{
-	public string name;
-	public string[ , ] factor;
-	//multi-dominant gene x 2
-	private int[ , , ] factorIndex;
-	private JsonGene originalGene;
-	public Gene(JsonGene original){
-		name = original.name;
-		factor = new string[original.numDominant, 2];
-		factorIndex = new int[original.numDominant, 2, 2];
-		originalGene = original;
-		int totalIndex = 0;
-		foreach(string[] element in original.factorList){
-			totalIndex += element.Length;
-		}
-		for(int i = 0; i < original.numDominant; ++i){
-			for(int j = 0; j < 2; ++j){
-				int count = 0, tempIndex = Random.Range(0, totalIndex);
-				while(tempIndex >= original.factorList[count].Length){
-					tempIndex -= original.factorList[count++].Length;
-				}
-				factor[i, j] = original.factorList[count][tempIndex];
-				factorIndex[i, j, 0] = count;
-				factorIndex[i, j, 1] = tempIndex;
-			}
-		}
-	}
-	
-	public Gene(Gene father, Gene mother){
-		if(father.name != mother.name){
-			name = null;
-			factor = null;
-			factorIndex = null;
-			return;
-		}
-		name = father.name;
-		factor = new string[father.factor.GetLength(0), 2];
-		factorIndex = new int[father.factor.GetLength(0), 2, 2];
-		originalGene = father.originalGene;
-		for(int i = 0; i < father.factor.GetLength(0); ++i){
-			if(Random.Range(0, 2) == 0){
-				factor[i, 0] = father.factor[i, 0];
-				factorIndex[i, 0, 0] = father.factorIndex[i, 0, 0];
-				factorIndex[i, 0, 1] = father.factorIndex[i, 0, 1];
-				factor[i, 1] = mother.factor[i, 1];
-				factorIndex[i, 1, 0] = mother.factorIndex[i, 1, 0];
-				factorIndex[i, 1, 1] = mother.factorIndex[i, 1, 1];
-			}
-			else{
-				factor[i, 0] = mother.factor[i, 0];
-				factorIndex[i, 0, 0] = mother.factorIndex[i, 0, 0];
-				factorIndex[i, 0, 1] = mother.factorIndex[i, 0, 1];
-				factor[i, 1] = father.factor[i, 1];
-				factorIndex[i, 1, 0] = father.factorIndex[i, 1, 0];
-				factorIndex[i, 1, 1] = father.factorIndex[i, 1, 1];
-			}
-		}
-	}
-	
-	public T Phenotype<T>(T baseObject, System.Func<T, T, T> Add, System.Func<T, float, T> Divide){
-		T result = baseObject;
-		for(int i = 0; i < factor.GetLength(0); ++i){
-			if(factorIndex[i, 0, 0] == factorIndex[i, 1, 0]){
-				result = Add(result, (T)(originalGene.factorHashTable[factorIndex[i, 0, 0]][factorIndex[i, 0, 1]][factorIndex[i, 1, 1]]));
-			}
-		}
-		result = Divide(result, (float)(factor.GetLength(0)));
-		return result;
-	}
-}
 
-public class FarmFunc : MonoBehaviour {
-	
-	public static readonly ulong carrotSeeDistance = 200;
+public class Gene{
+	/*-----public data type-----*/
+	// reference data of Gene class
+	public struct JsonGene{
+		public string name; // name of gene
+		public string[][] factorList; // list of factors
+									  // 1st index : dominancy(priority of factor)
+		public uint numDominant; // number of multi-dominant genes
+		public object[][][] factorHashTable; // table of combination of factors
+											 // 1st index : dominancy
+											 // 2nd, 3rd index : index of factors
+	}
+
+	/*-----public static variable-----*/
 	public static List<JsonGene> jsonGeneList = new List<JsonGene>();
 
-	// Use this for initialization
-	void Start () {
-	}
-	// Update is called once per frame
-	void Update () {
-	}
-	
+	/*-----public member variable-----*/
+	public string name; // name of gene
+	public string[ , ] factor; // list of name of factors
+							   // 1st index : numDominant
+							   // 2nd index : one of two factors in gene (gene always have two factors)
+
+	/*-----private member variable-----*/
+	private int[ , , ] factorIndex; // list of index of factors in JsonGene
+									// 1st index : numDominant
+									// 2nd index : one of two factors in gene
+									// 3rd index : one of two indexes of factorList of JsonGene
+	private JsonGene originalGene; // reference data
+
+	/*-----public static function-----*/
 	public static void init(){
 		jsonGeneList.Clear();
 		System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("GeneFile").text);
@@ -194,7 +137,100 @@ public class FarmFunc : MonoBehaviour {
 			}
 		}
 	}
+
+	/*-----public member function-----*/
+	// Constructor - create new gene from JsonGene
+	public Gene(JsonGene original){
+		// initialize
+		name = original.name;
+		factor = new string[original.numDominant, 2];
+		factorIndex = new int[original.numDominant, 2, 2];
+		originalGene = original;
+		int totalIndex = 0;
+		// find total number of factors
+		foreach(string[] element in original.factorList){
+			totalIndex += element.Length;
+		}
+		// pick random factor & assign factor's index
+		for(int i = 0; i < original.numDominant; ++i){
+			for(int j = 0; j < 2; ++j){
+				int count = 0, tempIndex = Random.Range(0, totalIndex);
+				while(tempIndex >= original.factorList[count].Length){
+					tempIndex -= original.factorList[count++].Length;
+				}
+				factor[i, j] = original.factorList[count][tempIndex];
+				factorIndex[i, j, 0] = count;
+				factorIndex[i, j, 1] = tempIndex;
+			}
+		}
+	}
 	
+	// Constructor - inherit from father Gene & mother Gene
+	public Gene(Gene father, Gene mother){
+		// name doesn't match
+		if(father.name != mother.name){
+			name = null;
+			factor = null;
+			factorIndex = null;
+			return;
+		}
+		// initialize
+		name = father.name;
+		factor = new string[father.factor.GetLength(0), 2];
+		factorIndex = new int[father.factor.GetLength(0), 2, 2];
+		originalGene = father.originalGene;
+		// inherit operation - get one factor from father, another factor from mother
+		for(int i = 0; i < father.factor.GetLength(0); ++i){
+			// get first factor from father
+			if(Random.Range(0, 2) == 0){
+				int randIndex = Random.Range(0, 2);
+				factor[i, 0] = father.factor[i, randIndex];
+				factorIndex[i, 0, 0] = father.factorIndex[i, randIndex, 0];
+				factorIndex[i, 0, 1] = father.factorIndex[i, randIndex, 1];
+				randIndex = Random.Range(0, 2);
+				factor[i, 1] = mother.factor[i, randIndex];
+				factorIndex[i, 1, 0] = mother.factorIndex[i, randIndex, 0];
+				factorIndex[i, 1, 1] = mother.factorIndex[i, randIndex, 1];
+			}
+			// get first factor from mother
+			else{
+				int randIndex = Random.Range(0, 2);
+				factor[i, 0] = mother.factor[i, randIndex];
+				factorIndex[i, 0, 0] = mother.factorIndex[i, randIndex, 0];
+				factorIndex[i, 0, 1] = mother.factorIndex[i, randIndex, 1];
+				randIndex = Random.Range(0, 2);
+				factor[i, 1] = father.factor[i, randIndex];
+				factorIndex[i, 1, 0] = father.factorIndex[i, randIndex, 0];
+				factorIndex[i, 1, 1] = father.factorIndex[i, randIndex, 1];
+			}
+		}
+	}
+	
+	// get phenotype of gene from factorHashTable
+	// in multi-dominant gene, result is average of each phenotype
+	public T Phenotype<T>(T baseObject, System.Func<T, T, T> Add, System.Func<T, int, T> Divide){
+		T result = baseObject;
+		for(int i = 0; i < factor.GetLength(0); ++i){
+			if(factorIndex[i, 0, 0] == factorIndex[i, 1, 0]){
+				result = Add(result, (T)(originalGene.factorHashTable[factorIndex[i, 0, 0]][factorIndex[i, 0, 1]][factorIndex[i, 1, 1]]));
+			}
+		}
+		result = Divide(result, (int)(factor.GetLength(0)));
+		return result;
+	}
+}
+
+public class FarmFunc : MonoBehaviour {
+	
+	public static readonly ulong carrotSeeDistance = 200;
+
+	// Use this for initialization
+	void Start () {
+	}
+	// Update is called once per frame
+	void Update () {
+	}
+
 	public static Rabbit selectRabbit(){
 		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
