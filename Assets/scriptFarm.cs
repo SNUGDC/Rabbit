@@ -24,7 +24,7 @@ public class scriptFarm : MonoBehaviour {
 	/*-----private static variables-----*/
 	private static bool mTestMode = false;
 	private static bool mShowPopup = false;
-	private static int mMoney = 1100;
+	private static long mMoney = 10000;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
 	private static GUIStyle mDictStyle = new GUIStyle();
@@ -61,6 +61,7 @@ public class scriptFarm : MonoBehaviour {
 		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
+		InvokeRepeating("rabbitCost", 20, 20);
 	}
 	
 	void Update () {
@@ -182,6 +183,12 @@ public class scriptFarm : MonoBehaviour {
 			if(GUI.Button (new Rect(mSWidth * 0.925f, mSHeight * 0.025f, mSWidth * 0.05f, mSHeight * 0.05f), "close")){
 				mShowPopup = false;
 			}
+		}
+	}
+
+	void rabbitCost(){
+		if(mMoney > Rabbit.rabbitList.Count * 100 || mTestMode){
+			mMoney -= Rabbit.rabbitList.Count * 100;
 		}
 	}
 }
