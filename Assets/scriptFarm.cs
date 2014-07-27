@@ -5,6 +5,9 @@ using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
+	/*-----readonly variables-----*/
+	public static readonly uint mMaxEndCount = 7;
+
 	/*-----public data types-----*/
 	public enum GameState {GAME, DICT, HELP};
 	
@@ -25,8 +28,11 @@ public class scriptFarm : MonoBehaviour {
 	private static bool mTestMode = false;
 	private static bool mShowPopup = false;
 	private static long mMoney = 10000;
+	private static uint mEndCount;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
+	private static GUIStyle mMoneyStyle = new GUIStyle();
+	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
@@ -55,13 +61,16 @@ public class scriptFarm : MonoBehaviour {
 		Rabbit.init();
 		Gene.init();
 		// style init
+		mEndCount = 0;
+		mEndStyle.fontSize = 50;
+		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mHelpStyle.fontSize = 50;
 		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
-		InvokeRepeating("rabbitCost", 20, 20);
+		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
 	void Update () {
@@ -103,7 +112,13 @@ public class scriptFarm : MonoBehaviour {
 
 	void OnGUI(){
 		// money - text
-		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString());
+		if(mMoney >= 0){
+			mMoneyStyle.normal.textColor = Color.white;
+		}
+		else{
+			mMoneyStyle.normal.textColor = Color.red;
+		}
+		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString(), mMoneyStyle);
 		// test mode - text
 		if(mTestMode){
 			GUI.Label (new Rect(mSWidth * 0.05f, mSHeight * 0.16f, mSWidth * 0.1f, mSHeight * 0.1f), "test mode");
@@ -112,7 +127,7 @@ public class scriptFarm : MonoBehaviour {
 		GUI.Label (new Rect (mSWidth * 0.9f, mSHeight * 0.9f, mSWidth * 0.1f, mSHeight * 0.1f), "trash", mPopupStyle);
 		// return button	
 		if (GUI.Button (new Rect (mSWidth * 0.0f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Return") && (mCurState == GameState.GAME)) {
-			Application.LoadLevel("sceneMainMenu");
+			Application.LoadLevel("sceneLevelSelect");
 		}
 		// dict button
 		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == GameState.GAME)) {
@@ -151,6 +166,15 @@ public class scriptFarm : MonoBehaviour {
 				Time.timeScale = 1; // resume game
 			}
 		}
+		// game over
+		if(mEndCount >= mMaxEndCount){
+			Time.timeScale = 0;
+			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Game Over", mEndStyle);
+			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
+				Time.timeScale = 1; // resume game
+				Application.LoadLevel("sceneLevelSelect");
+			}
+		}
 		// popup
 		if(mShowPopup){
 			string popupText = "";
@@ -187,8 +211,12 @@ public class scriptFarm : MonoBehaviour {
 	}
 
 	void rabbitCost(){
-		if(mMoney > Rabbit.rabbitList.Count * 100 || mTestMode){
-			mMoney -= Rabbit.rabbitList.Count * 100;
+		mMoney -= Rabbit.rabbitList.Count * 100;
+		if(mMoney < 0){
+			mEndCount++;
+		}
+		else if(0 < mEndCount && mEndCount < mMaxEndCount && !mTestMode){
+			mEndCount--;
 		}
 	}
 }
