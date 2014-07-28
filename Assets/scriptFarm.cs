@@ -38,6 +38,7 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static GameState mCurState = GameState.GAME;
 	private static Rabbit mTargetRabbit = null;
+	private static List<Rabbit> mRoomList = new List<Rabbit>();
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -82,6 +83,26 @@ public class scriptFarm : MonoBehaviour {
 				mTargetRabbit.selected = true;
 			}
 			mShowPopup = (mTargetRabbit != null);
+		}
+		// move rabbit to LoveRoom
+		if(Input.GetMouseButtonDown(1)){
+			// select rabbit
+			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
+			mTargetRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
+			if(mTargetRabbit != null && mTargetRabbit.isAdult){
+				// if rabbit is in LoveRoom, move rabbit to Random place on Farm
+				if(mTargetRabbit.inRoom){
+					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+					mTargetRabbit.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
+																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+				}
+				// if rabbit is not in Love Room, move rabbit to LoveRoom
+				else{
+
+				}
+				mTargetRabbit.inRoom = !mTargetRabbit.inRoom;
+			}
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
