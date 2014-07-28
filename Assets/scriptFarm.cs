@@ -124,7 +124,7 @@ public class scriptFarm : MonoBehaviour {
 				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
 				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
 				// in trash area
-				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
+				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f && !mTargetRabbit.inRoom){
 					Rabbit.delete(mTargetRabbit);
 					mMoney += 200;
 				}
