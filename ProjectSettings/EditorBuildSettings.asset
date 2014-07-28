@@ -11,3 +11,5 @@ EditorBuildSettings:
     path: Assets/scenePrepare.unity
   - enabled: 1
     path: Assets/sceneFarm.unity
+  - enabled: 1
+    path: Assets/sceneLevelSelect.unity
