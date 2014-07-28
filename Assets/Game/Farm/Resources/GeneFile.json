@@ -1,0 +1,121 @@
+{
+	"name" : "size",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numDominant" : 4,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
+}
+{
+	"name" : "color",
+	"factorList" : [
+					["BL", "W", "R", "B", "Y"]
+				   ],
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								["Black", "Gray", "Black", "Black", "Black"],
+								["Gray", "White", "Pink", "SkyBlue", "Primrose"],
+								["Black", "Pink", "Red", "Purple", "Orange"],
+								["Black", "SkyBlue", "Purple", "Blue", "Green"],
+								["Black", "Primrose", "Orange", "Green", "Yellow"]
+							]
+						]
+}
+{
+	"name" : "pattern",
+	"factorList" : [
+					["♠"],
+					["◆"],
+					["♥"],
+					["♣"]
+				   ],
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[null]
+							],
+							[
+								[null]
+							],
+							[
+								[null]
+							],
+							[
+								[null]
+							]
+						]
+}
+{
+	"name" : "ear",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
+}
+{
+	"name" : "eyecolor",
+	"factorList" : [
+					["A", "B"],
+					["O"]
+				   ],
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								["Blue", "Black"],
+							 	["Black", "Jade"]
+							],
+							[
+								["Red"]
+							]
+						]
+}
+{
+	"name" : "teeth",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numDominant" : 1,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
+}
+{
+	"name" : "length",
+	"factorList" : [
+					["X"],
+					["x"]
+				   ],
+	"numDominant" : 4,
+	"factorHashTable" : [
+							[
+								[1]
+							],
+							[
+								[0]
+							]
+						]
+}
