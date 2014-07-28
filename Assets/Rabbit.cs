@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 public class Rabbit : MonoBehaviour {
 	
+	/*-----readonly variables-----*/
+	public static readonly uint maxLife = 5000;
+
 	/*-----public data types-----*/
 	public enum Gender {MALE, FEMALE};
 	
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
-	public static readonly uint maxLife = 5000;
 	public static Sprite sprMaleRabbitStand;
 	public static Sprite sprFemaleRabbitStand;
 	public static Sprite sprRabbitHold;
