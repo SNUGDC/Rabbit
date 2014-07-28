@@ -7,6 +7,7 @@ public class scriptFarm : MonoBehaviour {
 
 	/*-----readonly variables-----*/
 	public static readonly uint mMaxEndCount = 7;
+	public static readonly uint pixToUnit = 3;
 
 	/*-----public data types-----*/
 	public enum GameState {GAME, DICT, HELP};
@@ -38,6 +39,7 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static GameState mCurState = GameState.GAME;
 	private static Rabbit mTargetRabbit = null;
+	private static List<Rabbit> mRoomList = new List<Rabbit>();
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -83,13 +85,46 @@ public class scriptFarm : MonoBehaviour {
 			}
 			mShowPopup = (mTargetRabbit != null);
 		}
+		// move rabbit to LoveRoom
+		if(Input.GetMouseButtonDown(1)){
+			// select rabbit
+			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
+			mTargetRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
+			mShowPopup = (mTargetRabbit != null);
+			if(mTargetRabbit != null && mTargetRabbit.isAdult){
+				// if rabbit is in LoveRoom, move rabbit to Random place on Farm
+				if(mTargetRabbit.inRoom){
+					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+					mTargetRabbit.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
+																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+					int tempIndex = mRoomList.IndexOf(mTargetRabbit);
+					mRoomList.Remove(mTargetRabbit);
+					for(int i = tempIndex; i < mRoomList.Count; ++i){
+						mRoomList[i].transform.position += new Vector3(0, Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit, 0);
+					}
+					mTargetRabbit.inRoom = false;
+				}
+				// if rabbit is not in Love Room, move rabbit to LoveRoom
+				else if(mRoomList.Count < 2){
+					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+					mTargetRabbit.transform.position = new Vector3(worldLeftBottom.x * 0.05f + worldRightTop.x * 0.95f,
+																   worldLeftBottom.y * 0.5f + worldRightTop.y * 0.5f -
+																   		Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit * mRoomList.Count,
+																   0);
+					mRoomList.Add(mTargetRabbit);
+					mTargetRabbit.inRoom = true;
+				}
+			}
+		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
 				mTargetRabbit.selected = false;
 				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
 				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
 				// in trash area
-				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f){
+				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f && !mTargetRabbit.inRoom){
 					Rabbit.delete(mTargetRabbit);
 					mMoney += 200;
 				}
@@ -149,6 +184,26 @@ public class scriptFarm : MonoBehaviour {
 		// test mode button
 		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == GameState.GAME)){
 			mTestMode = !mTestMode;
+		}
+		if(mRoomList.Count >= 2){
+			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == GameState.GAME)){
+				if(mRoomList[0].gender != mRoomList[1].gender){
+					if(mRoomList[0].gender == Rabbit.Gender.MALE){
+							Rabbit.create(mRoomList[0], mRoomList[1]);
+					}
+					else{
+						Rabbit.create(mRoomList[1], mRoomList[0]);
+					}
+				}
+				Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+				Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
+				foreach(Rabbit element in mRoomList){
+					element.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
+																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+					element.inRoom = false;
+				}
+				mRoomList.Clear();
+			}
 		}
 		// in dict mode
 		if (mCurState == GameState.DICT) {
