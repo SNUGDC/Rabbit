@@ -10,7 +10,7 @@ public class scriptFarm : MonoBehaviour {
 	public static readonly uint pixToUnit = 3;
 
 	/*-----public data types-----*/
-	public enum GameState {GAME, DICT, HELP};
+	public enum State {GAME, DICT, HELP};
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
@@ -37,7 +37,7 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
-	private static GameState mCurState = GameState.GAME;
+	private static State mCurState = State.GAME;
 	private static Rabbit mTargetRabbit = null;
 	private static List<Rabbit> mRoomList = new List<Rabbit>();
 	
@@ -161,32 +161,32 @@ public class scriptFarm : MonoBehaviour {
 		// trash
 		GUI.Label (new Rect (mSWidth * 0.9f, mSHeight * 0.9f, mSWidth * 0.1f, mSHeight * 0.1f), "trash", mPopupStyle);
 		// return button	
-		if (GUI.Button (new Rect (mSWidth * 0.0f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Return") && (mCurState == GameState.GAME)) {
+		if (GUI.Button (new Rect (mSWidth * 0.0f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Return") && (mCurState == State.GAME)) {
 			Application.LoadLevel("sceneLevelSelect");
 		}
 		// dict button
-		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == GameState.GAME)) {
-			mCurState = GameState.DICT;
+		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == State.GAME)) {
+			mCurState = State.DICT;
 			Time.timeScale = 0; // stop game time
 		}
 		// help button
-		if (GUI.Button (new Rect (mSWidth * 0.2f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Help") && (mCurState == GameState.GAME)) {
-			mCurState = GameState.HELP;
+		if (GUI.Button (new Rect (mSWidth * 0.2f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Help") && (mCurState == State.GAME)) {
+			mCurState = State.HELP;
 			Time.timeScale = 0; // stop game time
 		}
 		// buy button
-		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == GameState.GAME)) {
+		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == State.GAME)) {
 			if(mMoney >= 200 || mTestMode){
 				Rabbit.create(null, null);
 				mMoney -= 200;
 			}
 		}
 		// test mode button
-		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == GameState.GAME)){
+		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == State.GAME)){
 			mTestMode = !mTestMode;
 		}
 		if(mRoomList.Count >= 2){
-			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == GameState.GAME)){
+			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == State.GAME)){
 				if(mRoomList[0].gender != mRoomList[1].gender){
 					if(mRoomList[0].gender == Rabbit.Gender.MALE){
 							Rabbit.create(mRoomList[0], mRoomList[1]);
@@ -206,18 +206,18 @@ public class scriptFarm : MonoBehaviour {
 			}
 		}
 		// in dict mode
-		if (mCurState == GameState.DICT) {
+		if (mCurState == State.DICT) {
 			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Dictionary", mDictStyle);
 			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = GameState.GAME;
+				mCurState = State.GAME;
 				Time.timeScale = 1; // resume game
 			}
 		}
 		// in help mode
-		else if (mCurState == GameState.HELP) {
+		else if (mCurState == State.HELP) {
 			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Help", mHelpStyle);
 			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = GameState.GAME;
+				mCurState = State.GAME;
 				Time.timeScale = 1; // resume game
 			}
 		}
