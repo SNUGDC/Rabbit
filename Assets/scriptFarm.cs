@@ -81,7 +81,6 @@ public class scriptFarm : MonoBehaviour {
 			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
 			if(clicked != null){
 				mTargetRabbit = clicked.GetComponent<Rabbit>();
-				mTargetRabbit.selected = true;
 			}
 			mShowPopup = (mTargetRabbit != null);
 		}
@@ -120,7 +119,6 @@ public class scriptFarm : MonoBehaviour {
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
-				mTargetRabbit.selected = false;
 				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
 				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
 				// in trash area

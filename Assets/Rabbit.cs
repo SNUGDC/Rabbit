@@ -27,14 +27,7 @@ public class Rabbit : MonoBehaviour {
 			return mIsAdult;
 		}
 	}
-	public bool selected{
-		get{
-			return mSelected;
-		}
-		set{
-			mSelected = value;
-		}
-	}
+
 	public bool inRoom{
 		get{
 			return mInRoom;
@@ -69,7 +62,6 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----private member variables-----*/
 	private bool mIsAdult = false;
-	private bool mSelected = false;
 	private bool mInRoom = false;
 	private uint mFrameCounter = 0; // for Jump Loop
 	private ulong mLife = maxLife;
@@ -135,7 +127,7 @@ public class Rabbit : MonoBehaviour {
 			delete(this);
 			return;
 		}
-		if (!mSelected && !mInRoom) {
+		if (!GetComponent<Selectable>().selected && !mInRoom) {
 			// decide movingDir
 			if(mFrameCounter == mJumpPeriod * 4){
 				mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
@@ -178,7 +170,7 @@ public class Rabbit : MonoBehaviour {
 	}
 	
 	void OnMouseDrag(){
-		if (mSelected && !mInRoom) {
+		if (GetComponent<Selectable>().selected && !mInRoom) {
 			Vector2 temp = Input.mousePosition;
 			// limit draggable area
 			temp.x = Mathf.Max(temp.x, 0);
