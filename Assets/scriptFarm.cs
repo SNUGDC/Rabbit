@@ -103,6 +103,7 @@ public class scriptFarm : MonoBehaviour {
 						mRoomList[i].transform.position += new Vector3(0, Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit, 0);
 					}
 					mTargetRabbit.inRoom = false;
+					clicked.GetComponent<Draggable>().noDrag = false;
 				}
 				// if rabbit is not in Love Room, move rabbit to LoveRoom
 				else if(mRoomList.Count < 2){
@@ -114,6 +115,7 @@ public class scriptFarm : MonoBehaviour {
 																   0);
 					mRoomList.Add(mTargetRabbit);
 					mTargetRabbit.inRoom = true;
+					clicked.GetComponent<Draggable>().noDrag = true;
 				}
 			}
 		}
@@ -199,6 +201,7 @@ public class scriptFarm : MonoBehaviour {
 					element.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
 																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
 					element.inRoom = false;
+					element.GetComponent<Draggable>().noDrag = false;
 				}
 				mRoomList.Clear();
 			}

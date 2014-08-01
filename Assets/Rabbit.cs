@@ -168,18 +168,6 @@ public class Rabbit : MonoBehaviour {
 			mFrameCounter = 0;
 		}
 	}
-	
-	void OnMouseDrag(){
-		if (GetComponent<Selectable>().selected && !mInRoom) {
-			Vector2 temp = Input.mousePosition;
-			// limit draggable area
-			temp.x = Mathf.Max(temp.x, 0);
-			temp.x = Mathf.Min(temp.x, scriptFarm.sWidth * 0.9f);
-			temp.y = Mathf.Max(temp.y, 0);
-			temp.y = Mathf.Min(temp.y, scriptFarm.sHeight * 0.9f);
-			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
-		}
-	}
 
 	void grow(){
 		mIsAdult = true;

@@ -24,7 +24,7 @@ public class Selectable : MonoBehaviour {
 		if(Input.GetMouseButtonDown(0)){
 			Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
-			mSelected = (hit.collider.gameObject == gameObject);
+			mSelected = (hit.collider != null) && (hit.collider.gameObject == gameObject);
 		}
 		else if(Input.GetMouseButtonUp(0)){
 			mSelected = false;
