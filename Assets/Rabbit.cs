@@ -92,11 +92,6 @@ public class Rabbit : MonoBehaviour {
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
 	}
-
-	public static void delete(Rabbit target){
-		rabbitList.Remove(target);
-		DestroyImmediate(target.gameObject);
-	}
 	
 	/*-----public member functions-----*/
 	// Use this for initialization
@@ -111,7 +106,8 @@ public class Rabbit : MonoBehaviour {
 	void Update() {
 		// Rabbit Jump Loop
 		if(--mLife <= 0){
-			delete(this);
+			rabbitList.Remove(this);
+			DestroyImmediate(this.gameObject);
 			return;
 		}
 		if (!GetComponent<Selectable>().selected && !mInRoom) {
