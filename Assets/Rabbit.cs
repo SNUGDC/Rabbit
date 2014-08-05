@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Rabbit : MonoBehaviour {
 	
 	/*-----readonly variables-----*/
-	public static readonly uint maxLife = 5000;
+	public static readonly uint maxLife = 2000;
 
 	/*-----public data types-----*/
 	public enum Gender {MALE, FEMALE};
@@ -54,11 +54,6 @@ public class Rabbit : MonoBehaviour {
 			return mGender;
 		}
 	}
-	public List<Gene> geneList{
-		get{
-			return mGeneList;
-		}
-	}
 	
 	/*-----private member variables-----*/
 	private bool mIsAdult = false;
@@ -70,7 +65,6 @@ public class Rabbit : MonoBehaviour {
 	private Vector3 mMovingDir; // for Jump Loop
 	private Gender mGender;
 	private Color mColor = new Color(1, 1, 1);
-	private List<Gene> mGeneList = new List<Gene>();
 	
 	/*-----public static functions-----*/
 	public static void init(){
@@ -84,7 +78,7 @@ public class Rabbit : MonoBehaviour {
 		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
 	}
 
-	public static void create(Rabbit father, Rabbit mother){
+	public static void create(GameObject father, GameObject mother){
 		// select position of new rabbit
 		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
@@ -92,16 +86,9 @@ public class Rabbit : MonoBehaviour {
 		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
 		// assign genes to newRabbit
-		if(father == null || mother == null){
-			foreach(JsonGene element in Gene.jsonGeneList){
-				newRabbit.GetComponent<Rabbit>().geneList.Add (new Gene(element));
-			}
-		}
-		else{
-			for(int i = 0; i < father.geneList.Count; ++i){
-				newRabbit.GetComponent<Rabbit>().geneList.Add(new Gene(father.geneList[i], mother.geneList[i]));
-			}
-		}
+		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
+		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
+		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
 	}
@@ -171,7 +158,7 @@ public class Rabbit : MonoBehaviour {
 
 	void grow(){
 		mIsAdult = true;
-		mColor = mGeneList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		mColor = GetComponent<Gene>().list[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
 		renderer.material.color = mColor;
 	}
 }
