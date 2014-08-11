@@ -33,9 +33,9 @@ public class scriptFarm : MonoBehaviour {
 	}
 	
 	/*-----private static variables-----*/
-	private static bool mTestMode = false;
-	private static bool mShowPopup = false;
-	private static long mMoney = 10000;
+	private static bool mTestMode;
+	private static bool mShowPopup;
+	private static long mMoney;
 	private static uint mEndCount;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
@@ -66,6 +66,9 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
+		mTestMode = false;
+		mShowPopup = false;
+		mMoney = 10000;
 		// class init
 		Rabbit.init();
 		JsonGene.init();
