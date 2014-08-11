@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using LitJson;
 
 public class scriptFarm : MonoBehaviour {
 
@@ -24,6 +23,14 @@ public class scriptFarm : MonoBehaviour {
 			return mSHeight;
 		}
 	}
+	public static bool showPopup{
+		get{
+			return mShowPopup;
+		}
+		set{
+			mShowPopup = value;
+		}
+	}
 	
 	/*-----private static variables-----*/
 	private static bool mTestMode = false;
@@ -38,8 +45,8 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
-	private static Rabbit mTargetRabbit = null;
-	private static List<Rabbit> mRoomList = new List<Rabbit>();
+	private static GameObject mTargetRabbit = null;
+	private static List<GameObject> mRoomList = new List<GameObject>();
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -61,7 +68,7 @@ public class scriptFarm : MonoBehaviour {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
 		// class init
 		Rabbit.init();
-		Gene.init();
+		JsonGene.init();
 		// style init
 		mEndCount = 0;
 		mEndStyle.fontSize = 50;
@@ -78,22 +85,17 @@ public class scriptFarm : MonoBehaviour {
 	void Update () {
 		if(Input.GetMouseButtonDown(0)){
 			// select rabbit
-			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
-			if(clicked != null){
-				mTargetRabbit = clicked.GetComponent<Rabbit>();
-				mTargetRabbit.selected = true;
-			}
+			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
 			mShowPopup = (mTargetRabbit != null);
 		}
 		// move rabbit to LoveRoom
 		if(Input.GetMouseButtonDown(1)){
 			// select rabbit
-			GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return true;});
-			mTargetRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
+			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
 			mShowPopup = (mTargetRabbit != null);
-			if(mTargetRabbit != null && mTargetRabbit.isAdult){
+			if(mTargetRabbit != null && mTargetRabbit.GetComponent<Rabbit>().isAdult){
 				// if rabbit is in LoveRoom, move rabbit to Random place on Farm
-				if(mTargetRabbit.inRoom){
+				if(mTargetRabbit.GetComponent<Rabbit>().inRoom){
 					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
 					mTargetRabbit.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
@@ -103,7 +105,8 @@ public class scriptFarm : MonoBehaviour {
 					for(int i = tempIndex; i < mRoomList.Count; ++i){
 						mRoomList[i].transform.position += new Vector3(0, Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit, 0);
 					}
-					mTargetRabbit.inRoom = false;
+					mTargetRabbit.GetComponent<Rabbit>().inRoom = false;
+					mTargetRabbit.GetComponent<Draggable>().noDrag = false;
 				}
 				// if rabbit is not in Love Room, move rabbit to LoveRoom
 				else if(mRoomList.Count < 2){
@@ -114,25 +117,25 @@ public class scriptFarm : MonoBehaviour {
 																   		Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit * mRoomList.Count,
 																   0);
 					mRoomList.Add(mTargetRabbit);
-					mTargetRabbit.inRoom = true;
+					mTargetRabbit.GetComponent<Rabbit>().inRoom = true;
+					mTargetRabbit.GetComponent<Draggable>().noDrag = true;
 				}
 			}
 		}
 		if (Input.GetMouseButtonUp (0)) {
 			if(mTargetRabbit != null){
-				mTargetRabbit.selected = false;
-				GameObject clicked = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
-				Rabbit anotherRabbit = (clicked == null) ? null : clicked.GetComponent<Rabbit>();
+				GameObject anotherRabbit = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
 				// in trash area
-				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f && !mTargetRabbit.inRoom){
-					Rabbit.delete(mTargetRabbit);
+				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f && !mTargetRabbit.GetComponent<Rabbit>().inRoom){
+					Rabbit.rabbitList.Remove(mTargetRabbit.GetComponent<Rabbit>());
+					DestroyImmediate(mTargetRabbit);
 					mMoney += 200;
 				}
 				// found rabbit with different gender & both are grown
-				else if(anotherRabbit != null && anotherRabbit.gender != mTargetRabbit.gender
-					 && anotherRabbit.isAdult && mTargetRabbit.isAdult){
+				else if(anotherRabbit != null && anotherRabbit.GetComponent<Rabbit>().gender != mTargetRabbit.GetComponent<Rabbit>().gender
+					 && anotherRabbit.GetComponent<Rabbit>().isAdult && mTargetRabbit.GetComponent<Rabbit>().isAdult){
 					if(mMoney >= 100 || mTestMode){
-						if(anotherRabbit.gender == Rabbit.Gender.MALE){
+						if(anotherRabbit.GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
 							Rabbit.create(anotherRabbit, mTargetRabbit);
 						}
 						else{
@@ -187,20 +190,21 @@ public class scriptFarm : MonoBehaviour {
 		}
 		if(mRoomList.Count >= 2){
 			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == State.GAME)){
-				if(mRoomList[0].gender != mRoomList[1].gender){
-					if(mRoomList[0].gender == Rabbit.Gender.MALE){
-							Rabbit.create(mRoomList[0], mRoomList[1]);
+				if(mRoomList[0].GetComponent<Rabbit>().gender != mRoomList[1].GetComponent<Rabbit>().gender){
+					if(mRoomList[0].GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
+						Rabbit.create(mRoomList[0].gameObject, mRoomList[1].gameObject);
 					}
 					else{
-						Rabbit.create(mRoomList[1], mRoomList[0]);
+						Rabbit.create(mRoomList[1].gameObject, mRoomList[0].gameObject);
 					}
 				}
 				Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 				Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-				foreach(Rabbit element in mRoomList){
+				foreach(GameObject element in mRoomList){
 					element.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
 																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
-					element.inRoom = false;
+					element.GetComponent<Rabbit>().inRoom = false;
+					element.GetComponent<Draggable>().noDrag = false;
 				}
 				mRoomList.Clear();
 			}
@@ -231,20 +235,21 @@ public class scriptFarm : MonoBehaviour {
 			}
 		}
 		// popup
+		mShowPopup &= mTargetRabbit != null;
 		if(mShowPopup){
 			string popupText = "";
 			// basic information
-			popupText += ("ID : " + mTargetRabbit.id + "\n");
+			popupText += ("ID : " + mTargetRabbit.GetComponent<Rabbit>().id + "\n");
 			popupText += ("name : (none)\n");
-			popupText += ("life : " + mTargetRabbit.life + "\n");
-			popupText += ("gender : " + (mTargetRabbit.isAdult ? mTargetRabbit.gender.ToString() : "???") + "\n");
+			popupText += ("life : " + mTargetRabbit.GetComponent<Rabbit>().life + "\n");
+			popupText += ("gender : " + (mTargetRabbit.GetComponent<Rabbit>().isAdult ? mTargetRabbit.GetComponent<Rabbit>().gender.ToString() : "???") + "\n");
 			// add all gene's text in geneList
-			for(int i = 0; i < mTargetRabbit.geneList.Count; ++i){
-				popupText += mTargetRabbit.geneList[i].name + " : ";
-				if(mTargetRabbit.isAdult){
-					for(int j = 0; j < mTargetRabbit.geneList[i].factor.GetLength(0); ++j){
-						for(int k = 0; k < mTargetRabbit.geneList[i].factor.GetLength(1); ++k){
-							popupText += mTargetRabbit.geneList[i].factor[j, k];
+			for(int i = 0; i < mTargetRabbit.GetComponent<Gene>().list.Count; ++i){
+				popupText += mTargetRabbit.GetComponent<Gene>().list[i].name + " : ";
+				if(mTargetRabbit.GetComponent<Rabbit>().isAdult){
+					for(int j = 0; j < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(0); ++j){
+						for(int k = 0; k < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(1); ++k){
+							popupText += mTargetRabbit.GetComponent<Gene>().list[i].factor[j, k];
 						}
 						popupText += ", ";
 					}
