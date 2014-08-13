@@ -23,18 +23,8 @@ public class scriptFarm : MonoBehaviour {
 			return mSHeight;
 		}
 	}
-	public static bool showPopup{
-		get{
-			return mShowPopup;
-		}
-		set{
-			mShowPopup = value;
-		}
-	}
 	
 	/*-----private static variables-----*/
-	private static bool mTestMode;
-	private static bool mShowPopup;
 	private static long mMoney;
 	private static uint mEndCount;
 	private static int mSWidth = Screen.width;
@@ -66,8 +56,6 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
-		mTestMode = false;
-		mShowPopup = false;
 		mMoney = 10000;
 		// class init
 		Rabbit.init();
@@ -89,13 +77,11 @@ public class scriptFarm : MonoBehaviour {
 		if(Input.GetMouseButtonDown(0)){
 			// select rabbit
 			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
-			mShowPopup = (mTargetRabbit != null);
 		}
 		// move rabbit to LoveRoom
 		if(Input.GetMouseButtonDown(1)){
 			// select rabbit
 			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
-			mShowPopup = (mTargetRabbit != null);
 			if(mTargetRabbit != null && mTargetRabbit.GetComponent<Rabbit>().isAdult){
 				// if rabbit is in LoveRoom, move rabbit to Random place on Farm
 				if(mTargetRabbit.GetComponent<Rabbit>().inRoom){
@@ -136,7 +122,7 @@ public class scriptFarm : MonoBehaviour {
 				// found rabbit with different gender & both are grown
 				else if(anotherRabbit != null && anotherRabbit.GetComponent<Rabbit>().gender != mTargetRabbit.GetComponent<Rabbit>().gender
 					 && anotherRabbit.GetComponent<Rabbit>().isAdult && mTargetRabbit.GetComponent<Rabbit>().isAdult){
-					if(mMoney >= 100 || mTestMode){
+					if(mMoney >= 100){
 						if(anotherRabbit.GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
 							Rabbit.create(anotherRabbit, mTargetRabbit);
 						}
@@ -159,10 +145,6 @@ public class scriptFarm : MonoBehaviour {
 			mMoneyStyle.normal.textColor = Color.red;
 		}
 		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString(), mMoneyStyle);
-		// test mode - text
-		if(mTestMode){
-			GUI.Label (new Rect(mSWidth * 0.05f, mSHeight * 0.16f, mSWidth * 0.1f, mSHeight * 0.1f), "test mode");
-		}
 		// trash
 		GUI.Label (new Rect (mSWidth * 0.9f, mSHeight * 0.9f, mSWidth * 0.1f, mSHeight * 0.1f), "trash", mPopupStyle);
 		// return button	
@@ -181,14 +163,10 @@ public class scriptFarm : MonoBehaviour {
 		}
 		// buy button
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == State.GAME)) {
-			if(mMoney >= 200 || mTestMode){
+			if(mMoney >= 200){
 				Rabbit.create(null, null);
 				mMoney -= 200;
 			}
-		}
-		// test mode button
-		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == State.GAME)){
-			mTestMode = !mTestMode;
 		}
 		if(mRoomList.Count >= 2){
 			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == State.GAME)){
@@ -236,40 +214,6 @@ public class scriptFarm : MonoBehaviour {
 				Application.LoadLevel("sceneLevelSelect");
 			}
 		}
-		// popup
-		mShowPopup &= mTargetRabbit != null;
-		if(mShowPopup){
-			string popupText = "";
-			// basic information
-			popupText += ("ID : " + mTargetRabbit.GetComponent<Rabbit>().id + "\n");
-			popupText += ("name : (none)\n");
-			popupText += ("life : " + mTargetRabbit.GetComponent<Rabbit>().life + "\n");
-			popupText += ("gender : " + (mTargetRabbit.GetComponent<Rabbit>().isAdult ? mTargetRabbit.GetComponent<Rabbit>().gender.ToString() : "???") + "\n");
-			// add all gene's text in geneList
-			for(int i = 0; i < mTargetRabbit.GetComponent<Gene>().list.Count; ++i){
-				popupText += mTargetRabbit.GetComponent<Gene>().list[i].name + " : ";
-				if(mTargetRabbit.GetComponent<Rabbit>().isAdult){
-					for(int j = 0; j < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(0); ++j){
-						for(int k = 0; k < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(1); ++k){
-							popupText += mTargetRabbit.GetComponent<Gene>().list[i].factor[j, k];
-						}
-						popupText += ", ";
-					}
-					// remove last comma
-					popupText = popupText.Remove(popupText.Length - 2, 2);
-				}
-				// don't show genes when rabbit is not grown
-				else{
-					popupText += "???";
-				}
-				popupText += "\n";
-			}
-			GUI.Label (new Rect(mSWidth * 0.75f, mSHeight * 0.0f, mSWidth * 0.25f, mSHeight * 0.5f), popupText, mPopupStyle);
-			// popup close button
-			if(GUI.Button (new Rect(mSWidth * 0.925f, mSHeight * 0.025f, mSWidth * 0.05f, mSHeight * 0.05f), "close")){
-				mShowPopup = false;
-			}
-		}
 	}
 
 	void rabbitCost(){
@@ -277,7 +221,7 @@ public class scriptFarm : MonoBehaviour {
 		if(mMoney < 0){
 			mEndCount++;
 		}
-		else if(0 < mEndCount && mEndCount < mMaxEndCount && !mTestMode){
+		else if(0 < mEndCount && mEndCount < mMaxEndCount){
 			mEndCount--;
 		}
 	}
