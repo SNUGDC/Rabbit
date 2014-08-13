@@ -32,6 +32,7 @@ public struct JsonGene{
 		// set factorHashTable of each JsonGene
 		foreach(JsonGene element in list){
 			switch(element.name){
+				// pattern -> second index in rabbit's bodyList
 				case "size" :
 					break;
 				case "color" :
@@ -83,35 +84,101 @@ public struct JsonGene{
 						}
 					}
 					break;
+				// pattern -> second index in rabbit's bodyList
 				case "pattern" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "♠" :
+										arArElement[i] = 0;
+										break;
+									case "◆" :
+										arArElement[i] = 1;
+										break;
+									case "♥" :
+										arArElement[i] = 2;
+										break;
+									case "♣" :
+										arArElement[i] = 3;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				case "ear" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "none" :
+										arArElement[i] = 0;
+										break;
+									case "down" :
+										arArElement[i] = 1;
+										break;
+									case "round" :
+										arArElement[i] = 2;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				case "eyecolor" :
 					foreach(object[][] arElement in element.factorHashTable){
 						foreach(object[] arArElement in arElement){
 							for(int i = 0; i < arArElement.Length; ++i){
 								switch(arArElement[i].ToString()){
-								case "Black" :
-									arArElement[i] = new Color(0.0f, 0.0f, 0.0f);
-									break;
-								case "Blue" :
-									arArElement[i] = new Color(0.0f, 0.0f, 1.0f);
-									break;
-								case "Jade" : 
-									arArElement[i] = new Color(0.61f, 0.83f, 0.76f);
-									break;
-								default :
-									arArElement[i] = new Color(1.0f, 1.0f, 1.0f);
-									break;
+									case "Black" :
+										arArElement[i] = new Color(0.0f, 0.0f, 0.0f);
+										break;
+									case "Blue" :
+										arArElement[i] = new Color(0.0f, 0.0f, 1.0f);
+										break;
+									case "Jade" : 
+										arArElement[i] = new Color(0.61f, 0.83f, 0.76f);
+										break;
+									default :
+										arArElement[i] = new Color(1.0f, 1.0f, 1.0f);
+										break;
 								}
 							}
 						}
 					}
 					break;
 				case "teeth" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "0" :
+										arArElement[i] = 0;
+										break;
+									case "1" :
+										arArElement[i] = 1;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				case "length" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "0" :
+										arArElement[i] = 0;
+										break;
+									case "1" :
+										arArElement[i] = 1;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				default :
 					break;

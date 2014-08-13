@@ -12,14 +12,11 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
-	public static Sprite sprMaleRabbitStand;
-	public static Sprite sprFemaleRabbitStand;
-	public static Sprite sprRabbitHold;
-	public static Sprite sprRabbitJump;
-	public static Sprite sprRabbitLand;
-	public static Sprite sprSmallRabbit;
-	public static Sprite sprSmallJump;
-	public static Sprite sprSmallLand;
+	public static Sprite[ , ] headList = new Sprite[3, 5];
+	public static Sprite[ , ] bodyList = new Sprite[4, 5];
+	public static Sprite[] tailList = new Sprite[5];
+	public static Sprite[] teethList = new Sprite[2];
+	public static Sprite[] legList = new Sprite[5];
 	
 	/*-----public member variables-----*/
 	public bool isAdult{
@@ -58,24 +55,61 @@ public class Rabbit : MonoBehaviour {
 	/*-----private member variables-----*/
 	private bool mIsAdult = false;
 	private bool mInRoom = false;
-	private uint mFrameCounter = 0; // for Jump Loop
 	private ulong mLife = maxLife;
 	private int mId;
-	private uint mJumpPeriod = 15; // for Jump Loop
-	private Vector3 mMovingDir; // for Jump Loop
 	private Gender mGender;
 	private Color mColor = new Color(1, 1, 1);
+	private Sprite[] mSprite = new Sprite[5];
 	
 	/*-----public static functions-----*/
 	public static void init(){
-		sprMaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[5];
-		sprFemaleRabbitStand = Resources.LoadAll<Sprite>("txtrRabbit")[1];
-		sprRabbitHold = Resources.LoadAll<Sprite> ("txtrRabbit")[2];
-		sprRabbitJump = Resources.LoadAll<Sprite>("txtrRabbit")[3];
-		sprRabbitLand = Resources.LoadAll<Sprite>("txtrRabbit")[4];
-		sprSmallRabbit = Resources.LoadAll<Sprite>("txtrRabbit")[8];
-		sprSmallJump = Resources.LoadAll<Sprite>("txtrRabbit")[6];
-		sprSmallLand = Resources.LoadAll<Sprite>("txtrRabbit")[7];
+		headList[0, 0] = Resources.Load<Sprite>("ear_none_1");
+		headList[0, 1] = Resources.Load<Sprite>("ear_none_2");
+		headList[0, 2] = Resources.Load<Sprite>("ear_none_3");
+		headList[0, 3] = Resources.Load<Sprite>("ear_none_4");
+		headList[0, 4] = Resources.Load<Sprite>("ear_none_5");
+		headList[1, 0] = Resources.Load<Sprite>("ear_down_1");
+		headList[1, 1] = Resources.Load<Sprite>("ear_down_2");
+		headList[1, 2] = Resources.Load<Sprite>("ear_down_3");
+		headList[1, 3] = Resources.Load<Sprite>("ear_down_4");
+		headList[1, 4] = Resources.Load<Sprite>("ear_down_5");
+		headList[2, 0] = Resources.Load<Sprite>("ear_round_1");
+		headList[2, 1] = Resources.Load<Sprite>("ear_round_2");
+		headList[2, 2] = Resources.Load<Sprite>("ear_round_3");
+		headList[2, 3] = Resources.Load<Sprite>("ear_round_4");
+		headList[2, 4] = Resources.Load<Sprite>("ear_round_5");
+		bodyList[0, 0] = Resources.Load<Sprite>("body_spade_1");
+		bodyList[0, 1] = Resources.Load<Sprite>("body_spade_2");
+		bodyList[0, 2] = Resources.Load<Sprite>("body_spade_3");
+		bodyList[0, 3] = Resources.Load<Sprite>("body_spade_4");
+		bodyList[0, 4] = Resources.Load<Sprite>("body_spade_5");
+		bodyList[1, 0] = Resources.Load<Sprite>("body_diamond_1");
+		bodyList[1, 1] = Resources.Load<Sprite>("body_diamond_2");
+		bodyList[1, 2] = Resources.Load<Sprite>("body_diamond_3");
+		bodyList[1, 3] = Resources.Load<Sprite>("body_diamond_4");
+		bodyList[1, 4] = Resources.Load<Sprite>("body_diamond_5");
+		bodyList[2, 0] = Resources.Load<Sprite>("body_heart_1");
+		bodyList[2, 1] = Resources.Load<Sprite>("body_heart_2");
+		bodyList[2, 2] = Resources.Load<Sprite>("body_heart_3");
+		bodyList[2, 3] = Resources.Load<Sprite>("body_heart_4");
+		bodyList[2, 4] = Resources.Load<Sprite>("body_heart_5");
+		bodyList[3, 0] = Resources.Load<Sprite>("body_clover_1");
+		bodyList[3, 1] = Resources.Load<Sprite>("body_clover_2");
+		bodyList[3, 2] = Resources.Load<Sprite>("body_clover_3");
+		bodyList[3, 3] = Resources.Load<Sprite>("body_clover_4");
+		bodyList[3, 4] = Resources.Load<Sprite>("body_clover_5");
+		tailList[0] = Resources.Load<Sprite>("tail_1");
+		tailList[1] = Resources.Load<Sprite>("tail_2");
+		tailList[2] = Resources.Load<Sprite>("tail_3");
+		tailList[3] = Resources.Load<Sprite>("tail_4");
+		tailList[4] = Resources.Load<Sprite>("tail_5");
+		teethList[0] = Resources.Load<Sprite>("teeth_none");
+		teethList[1] = Resources.Load<Sprite>("teeth_out");
+		legList[0] = Resources.Load<Sprite>("leg_1");
+		legList[1] = Resources.Load<Sprite>("leg_2");
+		legList[2] = Resources.Load<Sprite>("leg_3");
+		legList[3] = Resources.Load<Sprite>("leg_4");
+		legList[4] = null;
 	}
 
 	public static void create(GameObject father, GameObject mother){
@@ -98,7 +132,16 @@ public class Rabbit : MonoBehaviour {
 	void Start() {
 		mId = rabbitList.Count;
 		mGender = (Random.Range(0, 2) == 0) ? Gender.MALE : Gender.FEMALE;
-		GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
+		mSprite[0] = Resources.Load<Sprite>("ear_none_3");
+		mSprite[1] = Resources.Load<Sprite>("body_none_3");
+		mSprite[2] = Resources.Load<Sprite>("tail_3");
+		mSprite[3] = Resources.Load<Sprite>("teeh_none");
+		mSprite[4] = Resources.Load<Sprite>("leg_3");
+		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
+		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
+		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
+		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
+		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		Invoke("grow", 5);
 	}
 	
@@ -110,51 +153,29 @@ public class Rabbit : MonoBehaviour {
 			DestroyImmediate(this.gameObject);
 			return;
 		}
-		if (!GetComponent<Selectable>().selected && !mInRoom) {
-			// decide movingDir
-			if(mFrameCounter == mJumpPeriod * 4){
-				mMovingDir = new Vector3 (Random.Range (-10, 10), Random.Range (-10, 10), 0);
-				// boundary check
-				Vector3 maxLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-				Vector3 maxRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-				if(mMovingDir.x + transform.position.x < maxLeftBottom.x || mMovingDir.x + transform.position.x > maxRightTop.x){
-					mMovingDir.x *= -1;
-				}
-				if(mMovingDir.y + transform.position.y < maxLeftBottom.y || mMovingDir.y + transform.position.y > maxRightTop.y){
-					mMovingDir.y *= -1;
-				}
-				// move position
-				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
-			}
-			else if(mFrameCounter == mJumpPeriod * 5){
-				transform.position += new Vector3(mMovingDir.x / 2, mMovingDir.y / 2, 0);
-			}
-			// change sprite
-			if(0 <= mFrameCounter && mFrameCounter < mJumpPeriod * 4){
-				if(!mIsAdult){
-					GetComponent<SpriteRenderer>().sprite = sprSmallRabbit;
-				}
-				else{
-					GetComponent<SpriteRenderer>().sprite = (mGender == Gender.MALE) ? sprMaleRabbitStand : sprFemaleRabbitStand;
-				}
-			}
-			else if(mJumpPeriod * 4 <= mFrameCounter && mFrameCounter < mJumpPeriod * 5){
-				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitJump : sprSmallJump;
-			}
-			else if(mJumpPeriod * 5 <= mFrameCounter && mFrameCounter < mJumpPeriod * 6){
-				GetComponent<SpriteRenderer>().sprite = (mIsAdult) ? sprRabbitLand : sprSmallLand;
-			}
-			mFrameCounter = (mFrameCounter + 1) % (mJumpPeriod * 6);
-		}
-		else{
-			GetComponent<SpriteRenderer>().sprite = sprRabbitHold;
-			mFrameCounter = 0;
-		}
+		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
+		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
+		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
+		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
+		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 	}
 
 	void grow(){
 		mIsAdult = true;
 		mColor = GetComponent<Gene>().list[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
-		renderer.material.color = mColor;
+		int patternIndex = GetComponent<Gene>().list[2].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		int lengthIndex = GetComponent<Gene>().list[6].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1;});
+		int earIndex = GetComponent<Gene>().list[3].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		int teethIndex = GetComponent<Gene>().list[5].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		mSprite[0] = headList[earIndex, lengthIndex];
+		mSprite[1] = bodyList[patternIndex, lengthIndex];
+		mSprite[2] = tailList[lengthIndex];
+		mSprite[3] = teethList[teethIndex];
+		mSprite[4] = legList[lengthIndex];
+		transform.Find("Head").renderer.material.color = mColor;
+		transform.Find("Body").renderer.material.color = mColor;
+		transform.Find("Tail").renderer.material.color = mColor;
+		transform.Find("Teeth").renderer.material.color = mColor;
+		transform.Find("Leg").renderer.material.color = mColor;
 	}
 }
