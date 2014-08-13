@@ -106,7 +106,7 @@ public class scriptFarm : MonoBehaviour {
 					int tempIndex = mRoomList.IndexOf(mTargetRabbit);
 					mRoomList.Remove(mTargetRabbit);
 					for(int i = tempIndex; i < mRoomList.Count; ++i){
-						mRoomList[i].transform.position += new Vector3(0, Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit, 0);
+						mRoomList[i].transform.position += new Vector3(0, 30, 0);
 					}
 					mTargetRabbit.GetComponent<Rabbit>().inRoom = false;
 					mTargetRabbit.GetComponent<Draggable>().noDrag = false;
@@ -116,8 +116,7 @@ public class scriptFarm : MonoBehaviour {
 					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
 					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
 					mTargetRabbit.transform.position = new Vector3(worldLeftBottom.x * 0.05f + worldRightTop.x * 0.95f,
-																   worldLeftBottom.y * 0.5f + worldRightTop.y * 0.5f -
-																   		Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit * mRoomList.Count,
+																   worldLeftBottom.y * 0.5f + worldRightTop.y * 0.5f - 30 * mRoomList.Count,
 																   0);
 					mRoomList.Add(mTargetRabbit);
 					mTargetRabbit.GetComponent<Rabbit>().inRoom = true;
