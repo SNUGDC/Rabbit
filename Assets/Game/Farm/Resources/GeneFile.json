@@ -41,32 +41,29 @@
 	"numDominant" : 1,
 	"factorHashTable" : [
 							[
-								[null]
+								["♠"]
 							],
 							[
-								[null]
+								["◆"]
 							],
 							[
-								[null]
+								["♥"]
 							],
 							[
-								[null]
+								["♣"]
 							]
 						]
 }
 {
 	"name" : "ear",
 	"factorList" : [
-					["X"],
-					["x"]
+					["X", "x"]
 				   ],
 	"numDominant" : 1,
 	"factorHashTable" : [
 							[
-								[1]
-							],
-							[
-								[0]
+								["none", "down"],
+								["down", "round"]
 							]
 						]
 }
