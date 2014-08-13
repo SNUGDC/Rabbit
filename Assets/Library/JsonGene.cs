@@ -91,16 +91,16 @@ public struct JsonGene{
 							for(int i = 0; i < arElement.Length; ++i){
 								switch(arArElement[i].ToString()){
 									case "♠" :
-										arArElement[i] = 1;
+										arArElement[i] = 0;
 										break;
 									case "◆" :
-										arArElement[i] = 2;
+										arArElement[i] = 1;
 										break;
 									case "♥" :
-										arArElement[i] = 3;
+										arArElement[i] = 2;
 										break;
 									case "♣" :
-										arArElement[i] = 4;
+										arArElement[i] = 3;
 										break;
 								}
 							}
@@ -108,6 +108,23 @@ public struct JsonGene{
 					}
 					break;
 				case "ear" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "none" :
+										arArElement[i] = 0;
+										break;
+									case "down" :
+										arArElement[i] = 1;
+										break;
+									case "round" :
+										arArElement[i] = 2;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				case "eyecolor" :
 					foreach(object[][] arElement in element.factorHashTable){
@@ -132,8 +149,36 @@ public struct JsonGene{
 					}
 					break;
 				case "teeth" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "0" :
+										arArElement[i] = 0;
+										break;
+									case "1" :
+										arArElement[i] = 1;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				case "length" :
+					foreach(object[][] arElement in element.factorHashTable){
+						foreach(object[] arArElement in arElement){
+							for(int i = 0; i < arElement.Length; ++i){
+								switch(arArElement[i].ToString()){
+									case "0" :
+										arArElement[i] = 0;
+										break;
+									case "1" :
+										arArElement[i] = 1;
+										break;
+								}
+							}
+						}
+					}
 					break;
 				default :
 					break;

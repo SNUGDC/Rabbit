@@ -163,6 +163,15 @@ public class Rabbit : MonoBehaviour {
 	void grow(){
 		mIsAdult = true;
 		mColor = GetComponent<Gene>().list[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		int patternIndex = GetComponent<Gene>().list[2].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		int lengthIndex = GetComponent<Gene>().list[6].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1;});
+		int earIndex = GetComponent<Gene>().list[3].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		int teethIndex = GetComponent<Gene>().list[5].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		mSprite[0] = headList[earIndex, lengthIndex];
+		mSprite[1] = bodyList[patternIndex, lengthIndex];
+		mSprite[2] = tailList[lengthIndex];
+		mSprite[3] = teethList[teethIndex];
+		mSprite[4] = legList[lengthIndex];
 		transform.Find("Head").renderer.material.color = mColor;
 		transform.Find("Body").renderer.material.color = mColor;
 		transform.Find("Tail").renderer.material.color = mColor;
