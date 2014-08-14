@@ -23,12 +23,17 @@ public class scriptFarm : MonoBehaviour {
 			return mSHeight;
 		}
 	}
-	
+	public static Diamond fieldArea{
+		get{
+			return mFieldArea;
+		}
+	}
 	/*-----private static variables-----*/
 	private static long mMoney;
 	private static uint mEndCount;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
+	private static Diamond mFieldArea;
 	private static GUIStyle mMoneyStyle = new GUIStyle();
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
@@ -62,10 +67,18 @@ public class scriptFarm : MonoBehaviour {
 		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
+		mFieldArea = new Diamond(Camera.main.ScreenToWorldPoint(new Vector2(mSWidth * 0.5f, mSHeight * 0.5f)), mSWidth * 0.3f, mSHeight * 0.2f);
 		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
 	void Update () {
+	}
+
+	void OnDrawGizmos(){
+		Gizmos.DrawLine(mFieldArea.left(), mFieldArea.top());
+		Gizmos.DrawLine(mFieldArea.top(), mFieldArea.right());
+		Gizmos.DrawLine(mFieldArea.right(), mFieldArea.bottom());
+		Gizmos.DrawLine(mFieldArea.bottom(), mFieldArea.left());
 	}
 
 	void OnGUI(){

@@ -29,11 +29,15 @@ public class Draggable : MonoBehaviour {
 		if (selected && !mNoDrag) {
 			Vector2 temp = Input.mousePosition;
 			// limit draggable area
+			//if(scriptFarm.fieldArea.Contains(Camera.main.ScreenToWorldPoint(temp))){
+				transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
+			//}
+			/*
 			temp.x = Mathf.Max(temp.x, 0);
 			temp.x = Mathf.Min(temp.x, scriptFarm.sWidth * 0.9f);
 			temp.y = Mathf.Max(temp.y, 0);
 			temp.y = Mathf.Min(temp.y, scriptFarm.sHeight * 0.9f);
-			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
+			*/
 		}
 	}
 }
