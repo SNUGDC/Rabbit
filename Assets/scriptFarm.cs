@@ -9,7 +9,7 @@ public class scriptFarm : MonoBehaviour {
 	public static readonly uint pixToUnit = 3;
 
 	/*-----public data types-----*/
-	public enum State {GAME, DICT, HELP};
+	public enum State {GAME, DICT};
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
@@ -32,7 +32,6 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mMoneyStyle = new GUIStyle();
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
-	private static GUIStyle mHelpStyle = new GUIStyle();
 	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
 	private static GameObject mTargetRabbit = null;
@@ -66,8 +65,6 @@ public class scriptFarm : MonoBehaviour {
 		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
-		mHelpStyle.fontSize = 50;
-		mHelpStyle.normal.background = new Texture2D(2, 2);
 		mPopupStyle.fontSize = 15;
 		mPopupStyle.normal.background = new Texture2D(2, 2);
 		InvokeRepeating("rabbitCost", 6, 6);
@@ -156,11 +153,6 @@ public class scriptFarm : MonoBehaviour {
 			mCurState = State.DICT;
 			Time.timeScale = 0; // stop game time
 		}
-		// help button
-		if (GUI.Button (new Rect (mSWidth * 0.2f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Help") && (mCurState == State.GAME)) {
-			mCurState = State.HELP;
-			Time.timeScale = 0; // stop game time
-		}
 		// buy button
 		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == State.GAME)) {
 			if(mMoney >= 200){
@@ -192,14 +184,6 @@ public class scriptFarm : MonoBehaviour {
 		// in dict mode
 		if (mCurState == State.DICT) {
 			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Dictionary", mDictStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = State.GAME;
-				Time.timeScale = 1; // resume game
-			}
-		}
-		// in help mode
-		else if (mCurState == State.HELP) {
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Help", mHelpStyle);
 			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
 				mCurState = State.GAME;
 				Time.timeScale = 1; // resume game
