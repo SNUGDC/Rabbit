@@ -61,6 +61,8 @@ public class Rabbit : MonoBehaviour {
 	private Gender mGender;
 	private Color mColor = new Color(1, 1, 1);
 	public Sprite[] mSprite = new Sprite[5];
+	public Rabbit mFather = null;
+	public Rabbit mMother = null;
 	
 	/*-----public static functions-----*/
 	public static void init(){
@@ -121,6 +123,12 @@ public class Rabbit : MonoBehaviour {
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
 		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
+		try{
+			newRabbit.GetComponent<Rabbit>().mFather = father.GetComponent<Rabbit>();
+		}catch{}
+		try{
+			newRabbit.GetComponent<Rabbit>().mMother = mother.GetComponent<Rabbit>();
+		}catch{}
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
 	}

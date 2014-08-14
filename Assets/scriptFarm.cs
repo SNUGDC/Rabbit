@@ -42,6 +42,8 @@ public class scriptFarm : MonoBehaviour {
 	private static State mCurState = State.GAME;
 	private static Vector2 mScrollPos = new Vector2(0, 0);
 	public static Camera mListCamera;
+	private static bool mSelling;
+	public static List<Rabbit> mRoomList;
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -68,6 +70,8 @@ public class scriptFarm : MonoBehaviour {
 		JsonGene.init();
 		// style init
 		mEndCount = 0;
+		mSelling = false;
+		mRoomList = new List<Rabbit>();
 		mEndStyle.fontSize = 50;
 		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
@@ -84,13 +88,29 @@ public class scriptFarm : MonoBehaviour {
 
 	void Update () {
 		if(Input.GetMouseButtonDown(0)){
+			GameObject selDum;
 			switch(mCurState){
 				case State.GAME :
 					mTarget = clickedObject(Camera.main, "rabbit", delegate(GameObject arg1){return true;});
 					break;
 				case State.MONEY :
-					GameObject selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
-					if(selDum != null){
+					selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
+					if(selDum != null && Rabbit.dummyList.IndexOf(selDum) != -1){
+						int index = Rabbit.dummyList.IndexOf(selDum);
+						DestroyImmediate(Rabbit.rabbitList[index].gameObject);
+						DestroyImmediate(Rabbit.dummyList[index]);
+						Rabbit.rabbitList.RemoveAt(index);
+						Rabbit.dummyList.RemoveAt(index);
+						for(int i = index; i < Rabbit.dummyList.Count; ++i){
+							Rabbit.dummyList[i].transform.position = new Vector2(Rabbit.dummyList[i].transform.position.x,
+																				 Rabbit.dummyList[i].transform.position.y + sHeight * 0.1f);
+						}
+						mMoney += 200;
+					}
+					break;
+				case State.SELECT :
+					selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
+					if(selDum != null && Rabbit.dummyList.IndexOf(selDum) != -1){
 						mTarget = Rabbit.rabbitList[Rabbit.dummyList.IndexOf(selDum)].gameObject;
 						foreach(GameObject element in Rabbit.dummyList){
 							DestroyImmediate(element);
@@ -107,7 +127,12 @@ public class scriptFarm : MonoBehaviour {
 			}
 		}
 		if(Input.GetMouseButtonUp(0)){
-			if(mTarget != null && !mFieldArea.Contains(mTarget.transform.position)){
+			if(mTarget != null && GameObject.Find("House") == clickedObject(Camera.main, "house", delegate(GameObject arg1){return true;})){
+				if(mRoomList.Count <= 2){
+					mRoomList.Add(mTarget.GetComponent<Rabbit>());
+				}
+			}
+			else if(mTarget != null && !mFieldArea.Contains(mTarget.transform.position)){
 				Rabbit.rabbitList.Remove(mTarget.GetComponent<Rabbit>());
 				DestroyImmediate(mTarget);
 				mMoney += 200;
@@ -138,6 +163,15 @@ public class scriptFarm : MonoBehaviour {
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.3f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), Rabbit.rabbitList.Count.ToString() + "마리") && (mCurState == State.GAME)){
 			mCurState = State.SELECT;
+			mListCamera.transform.position = new Vector3(700, 0, -10);
+			foreach(Rabbit element in Rabbit.rabbitList){
+				Rabbit.createDummy(element);
+			}
+			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+				Rabbit.dummyList[i].transform.position = new Vector3(700 - mSWidth * 0.3f + mSWidth * 0.05f,
+																	 0 + mSHeight * 0.3f - mSHeight * (0.05f + 0.1f * i), 0);
+			}
+			mListCamera.enabled = true;
 			Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.5f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "도감") && (mCurState == State.GAME)){
@@ -155,11 +189,28 @@ public class scriptFarm : MonoBehaviour {
 		}
 		switch(mCurState){
 			case State.GAME :
+				if(mRoomList.Count >= 2){
+					if(GUI.Button(new Rect(mSWidth * 0.9f, mSHeight * 0.6f, mSWidth * 0.05f, mSHeight * 0.05f), "!!!")){
+						if(mRoomList[0].gender != mRoomList[1].gender){
+							if(mRoomList[0].gender == Rabbit.Gender.MALE){
+								Rabbit.create(mRoomList[0].gameObject, mRoomList[1].gameObject);
+							}
+							else{
+								Rabbit.create(mRoomList[1].gameObject, mRoomList[0].gameObject);
+							}
+						}
+						mRoomList[0].gameObject.transform.position = new Vector2(0, 0);
+						mRoomList[1].gameObject.transform.position = new Vector2(0, 0);
+						mRoomList.Clear();
+					}
+				}
 				break;
 			case State.MONEY :
 				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.1f, mSWidth * 0.2f, mSHeight * 0.1f), "↑")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y + mSHeight * 0.1f, -10);
 				}
 				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.8f, mSWidth * 0.2f, mSHeight * 0.1f), "↓")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y - mSHeight * 0.1f, -10);
 				}
 				if(GUI.Button(new Rect(mSWidth * 0.6f, mSHeight * 0.15f, mSWidth * 0.05f, mSHeight * 0.05f), "X")){
 					foreach(GameObject element in Rabbit.dummyList){
@@ -172,6 +223,21 @@ public class scriptFarm : MonoBehaviour {
 				}
 				break;
 			case State.SELECT :
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.1f, mSWidth * 0.2f, mSHeight * 0.1f), "↑")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y + mSHeight * 0.1f, -10);
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.8f, mSWidth * 0.2f, mSHeight * 0.1f), "↓")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y - mSHeight * 0.1f, -10);
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.6f, mSHeight * 0.15f, mSWidth * 0.05f, mSHeight * 0.05f), "X")){
+					foreach(GameObject element in Rabbit.dummyList){
+						DestroyImmediate(element);
+					}
+					Rabbit.dummyList.Clear();
+					mListCamera.enabled = false;
+					mCurState = State.GAME;
+					Time.timeScale = 1;
+				}
 				break;
 			case State.DICT :
 				break;
