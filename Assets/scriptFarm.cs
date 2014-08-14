@@ -34,6 +34,7 @@ public class scriptFarm : MonoBehaviour {
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
 	private static Diamond mFieldArea;
+	private static GameObject mTarget;
 	private static GUIStyle mMoneyStyle = new GUIStyle();
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
@@ -72,6 +73,16 @@ public class scriptFarm : MonoBehaviour {
 	}
 	
 	void Update () {
+		if(Input.GetMouseButtonDown(0)){
+			mTarget = clickedObject("rabbit", delegate(GameObject arg1){return true;});
+		}
+		if(Input.GetMouseButtonUp(0)){
+			if(mTarget != null && !mFieldArea.Contains(mTarget.transform.position)){
+				Rabbit.rabbitList.Remove(mTarget.GetComponent<Rabbit>());
+				DestroyImmediate(mTarget);
+				mMoney += 200;
+			}
+		}
 	}
 
 	void OnDrawGizmos(){
