@@ -9,7 +9,7 @@ public class scriptFarm : MonoBehaviour {
 	public static readonly uint pixToUnit = 3;
 
 	/*-----public data types-----*/
-	public enum State {GAME, DICT};
+	public enum State {GAME, MONEY, SELECT, DICT, MENU, STORE};
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
@@ -39,6 +39,7 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
+	private static Vector2 mScrollPos = new Vector2(0, 0);
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -69,6 +70,7 @@ public class scriptFarm : MonoBehaviour {
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mFieldArea = new Diamond(Camera.main.ScreenToWorldPoint(new Vector2(mSWidth * 0.5f, mSHeight * 0.5f)), mSWidth * 0.3f, mSHeight * 0.2f);
+		Rabbit.create(null, null);
 		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
@@ -93,6 +95,41 @@ public class scriptFarm : MonoBehaviour {
 	}
 
 	void OnGUI(){
+		if(GUI.Button(new Rect(mSWidth * 0.1f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), mMoney.ToString() + "G") && (mCurState == State.GAME)){
+			mCurState = State.MONEY;
+			Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.3f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), Rabbit.rabbitList.Count.ToString() + "마리") && (mCurState == State.GAME)){
+			mCurState = State.SELECT;
+			Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.5f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "도감") && (mCurState == State.GAME)){
+			mCurState = State.DICT;
+			Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "상점") && (mCurState == State.GAME)){
+			mCurState = State.STORE;
+			Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.15f, mSWidth * 0.15f, mSHeight * 0.1f), "메뉴") && (mCurState == State.GAME)){
+			mCurState = State.MENU;
+			Time.timeScale = 0;
+		}
+		switch(mCurState){
+			case State.GAME :
+				break;
+			case State.MONEY :
+				break;
+			case State.SELECT :
+				break;
+			case State.DICT :
+				break;
+			case State.STORE :
+				break;
+			case State.MENU :
+				break;
+		}
+		/*
 		// money - text
 		if(mMoney >= 0){
 			mMoneyStyle.normal.textColor = Color.white;
@@ -130,6 +167,7 @@ public class scriptFarm : MonoBehaviour {
 				Application.LoadLevel("sceneLevelSelect");
 			}
 		}
+		*/
 	}
 
 	void rabbitCost(){
