@@ -32,7 +32,6 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mMoneyStyle = new GUIStyle();
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
-	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
 	private static GameObject mTargetRabbit = null;
 	private static List<GameObject> mRoomList = new List<GameObject>();
@@ -65,8 +64,6 @@ public class scriptFarm : MonoBehaviour {
 		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
-		mPopupStyle.fontSize = 15;
-		mPopupStyle.normal.background = new Texture2D(2, 2);
 		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
