@@ -13,6 +13,7 @@ public class scriptFarm : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
+	public static GameObject objDummy;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -40,11 +41,12 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
 	private static Vector2 mScrollPos = new Vector2(0, 0);
+	public static Camera mListCamera;
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
-	public static GameObject clickedObject(string tag, System.Func<GameObject, bool> condition){
-		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+	public static GameObject clickedObject(Camera cam, string tag, System.Func<GameObject, bool> condition){
+		Vector2 ray = cam.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
 		GameObject result = null;
 		foreach(RaycastHit2D element in hit){
@@ -59,6 +61,7 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
+		objDummy = (GameObject)Resources.Load("prefabDummy");
 		mMoney = 10000;
 		// class init
 		Rabbit.init();
@@ -71,12 +74,37 @@ public class scriptFarm : MonoBehaviour {
 		mDictStyle.normal.background = new Texture2D(2, 2);
 		mFieldArea = new Diamond(Camera.main.ScreenToWorldPoint(new Vector2(mSWidth * 0.5f, mSHeight * 0.5f)), mSWidth * 0.3f, mSHeight * 0.2f);
 		Rabbit.create(null, null);
+		mListCamera = GameObject.Find("List Camera").camera;
 		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
+	void offLight(){
+		GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = false;
+	}
+
 	void Update () {
 		if(Input.GetMouseButtonDown(0)){
-			mTarget = clickedObject("rabbit", delegate(GameObject arg1){return true;});
+			switch(mCurState){
+				case State.GAME :
+					mTarget = clickedObject(Camera.main, "rabbit", delegate(GameObject arg1){return true;});
+					break;
+				case State.MONEY :
+					GameObject selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
+					if(selDum != null){
+						mTarget = Rabbit.rabbitList[Rabbit.dummyList.IndexOf(selDum)].gameObject;
+						foreach(GameObject element in Rabbit.dummyList){
+							DestroyImmediate(element);
+						}
+						Rabbit.dummyList.Clear();
+						mListCamera.enabled = false;
+						mCurState = State.GAME;
+						Time.timeScale = 1;
+						GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = true;
+						GameObject.Find("Light").transform.position = new Vector3(mTarget.transform.position.x, mTarget.transform.position.y, 2);
+						Invoke("offLight", 1);
+					}
+					break;
+			}
 		}
 		if(Input.GetMouseButtonUp(0)){
 			if(mTarget != null && !mFieldArea.Contains(mTarget.transform.position)){
@@ -97,6 +125,15 @@ public class scriptFarm : MonoBehaviour {
 	void OnGUI(){
 		if(GUI.Button(new Rect(mSWidth * 0.1f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), mMoney.ToString() + "G") && (mCurState == State.GAME)){
 			mCurState = State.MONEY;
+			mListCamera.transform.position = new Vector3(700, 0, -10);
+			foreach(Rabbit element in Rabbit.rabbitList){
+				Rabbit.createDummy(element);
+			}
+			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+				Rabbit.dummyList[i].transform.position = new Vector3(700 - mSWidth * 0.3f + mSWidth * 0.05f,
+																	 0 + mSHeight * 0.3f - mSHeight * (0.05f + 0.1f * i), 0);
+			}
+			mListCamera.enabled = true;
 			Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.3f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), Rabbit.rabbitList.Count.ToString() + "마리") && (mCurState == State.GAME)){
@@ -120,6 +157,19 @@ public class scriptFarm : MonoBehaviour {
 			case State.GAME :
 				break;
 			case State.MONEY :
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.1f, mSWidth * 0.2f, mSHeight * 0.1f), "↑")){
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.8f, mSWidth * 0.2f, mSHeight * 0.1f), "↓")){
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.6f, mSHeight * 0.15f, mSWidth * 0.05f, mSHeight * 0.05f), "X")){
+					foreach(GameObject element in Rabbit.dummyList){
+						DestroyImmediate(element);
+					}
+					Rabbit.dummyList.Clear();
+					mListCamera.enabled = false;
+					mCurState = State.GAME;
+					Time.timeScale = 1;
+				}
 				break;
 			case State.SELECT :
 				break;

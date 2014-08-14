@@ -12,6 +12,7 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
+	public static List<GameObject> dummyList = new List<GameObject>();
 	public static Sprite[ , ] headList = new Sprite[3, 5];
 	public static Sprite[ , ] bodyList = new Sprite[4, 5];
 	public static Sprite[] tailList = new Sprite[5];
@@ -122,6 +123,21 @@ public class Rabbit : MonoBehaviour {
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
+	}
+
+	public static void createDummy(Rabbit original){
+		GameObject newDummy = (GameObject)Instantiate(scriptFarm.objDummy, new Vector2(700, 0), Quaternion.identity);
+		newDummy.transform.Find("Head").GetComponent<SpriteRenderer>().sprite = original.mSprite[0];
+		newDummy.transform.Find("Head").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Body").GetComponent<SpriteRenderer>().sprite = original.mSprite[1];
+		newDummy.transform.Find("Body").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = original.mSprite[2];
+		newDummy.transform.Find("Tail").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = original.mSprite[3];
+		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
+		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		dummyList.Add(newDummy);
 	}
 	
 	/*-----public member functions-----*/
