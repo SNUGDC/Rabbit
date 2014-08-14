@@ -33,8 +33,6 @@ public class scriptFarm : MonoBehaviour {
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
-	private static GameObject mTargetRabbit = null;
-	private static List<GameObject> mRoomList = new List<GameObject>();
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
@@ -68,10 +66,6 @@ public class scriptFarm : MonoBehaviour {
 	}
 	
 	void Update () {
-		if(Input.GetMouseButtonDown(0)){
-			// select rabbit
-			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
-		}
 	}
 
 	void OnGUI(){
