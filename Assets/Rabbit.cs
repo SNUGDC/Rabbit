@@ -59,7 +59,7 @@ public class Rabbit : MonoBehaviour {
 	private int mId;
 	private Gender mGender;
 	private Color mColor = new Color(1, 1, 1);
-	private Sprite[] mSprite = new Sprite[5];
+	public Sprite[] mSprite = new Sprite[5];
 	
 	/*-----public static functions-----*/
 	public static void init(){
@@ -114,10 +114,7 @@ public class Rabbit : MonoBehaviour {
 
 	public static void create(GameObject father, GameObject mother){
 		// select position of new rabbit
-		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
-		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+		Vector2 tempPosition = (Vector2)Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();

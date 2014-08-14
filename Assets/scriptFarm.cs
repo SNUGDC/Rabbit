@@ -6,7 +6,7 @@ public class scriptFarm : MonoBehaviour {
 
 	/*-----readonly variables-----*/
 	public static readonly uint mMaxEndCount = 7;
-	public static readonly uint pixToUnit = 3;
+	public static readonly uint pixToUnit = 30;
 
 	/*-----public data types-----*/
 	public enum State {GAME, MONEY, SELECT, DICT, MENU, STORE};
@@ -108,8 +108,9 @@ public class scriptFarm : MonoBehaviour {
 			Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "상점") && (mCurState == State.GAME)){
-			mCurState = State.STORE;
-			Time.timeScale = 0;
+			Rabbit.create(null, null);
+			//mCurState = State.STORE;
+			//Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.15f, mSWidth * 0.15f, mSHeight * 0.1f), "메뉴") && (mCurState == State.GAME)){
 			mCurState = State.MENU;
