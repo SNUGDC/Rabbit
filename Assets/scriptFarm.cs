@@ -6,13 +6,16 @@ public class scriptFarm : MonoBehaviour {
 
 	/*-----readonly variables-----*/
 	public static readonly uint mMaxEndCount = 7;
-	public static readonly uint pixToUnit = 3;
+	public static readonly uint pixToUnit = 30;
+	public static readonly uint maintenanceCost = 100;
 
 	/*-----public data types-----*/
-	public enum State {GAME, DICT, HELP};
+	public enum State {GAME, MONEY, SELECT, DICT, MENU, STORE};
 	
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
+	public static GameObject objDummy;
+	public static GameObject objText;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -23,35 +26,31 @@ public class scriptFarm : MonoBehaviour {
 			return mSHeight;
 		}
 	}
-	public static bool showPopup{
+	public static Diamond fieldArea{
 		get{
-			return mShowPopup;
-		}
-		set{
-			mShowPopup = value;
+			return mFieldArea;
 		}
 	}
-	
 	/*-----private static variables-----*/
-	private static bool mTestMode;
-	private static bool mShowPopup;
 	private static long mMoney;
 	private static uint mEndCount;
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
+	private static Diamond mFieldArea;
+	private static GameObject mTarget;
 	private static GUIStyle mMoneyStyle = new GUIStyle();
 	private static GUIStyle mEndStyle = new GUIStyle();
 	private static GUIStyle mDictStyle = new GUIStyle();
-	private static GUIStyle mHelpStyle = new GUIStyle();
-	private static GUIStyle mPopupStyle = new GUIStyle();
 	private static State mCurState = State.GAME;
-	private static GameObject mTargetRabbit = null;
-	private static List<GameObject> mRoomList = new List<GameObject>();
+	private static Vector2 mScrollPos = new Vector2(0, 0);
+	public static Camera mListCamera;
+	private static bool mSelling;
+	public static List<Rabbit> mRoomList;
 	
 	/*-----public static functions-----*/
 	// find gameobject at mouse position with condition
-	public static GameObject clickedObject(string tag, System.Func<GameObject, bool> condition){
-		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+	public static GameObject clickedObject(Camera cam, string tag, System.Func<GameObject, bool> condition){
+		Vector2 ray = cam.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hit = Physics2D.RaycastAll(ray, Vector2.zero);
 		GameObject result = null;
 		foreach(RaycastHit2D element in hit){
@@ -66,219 +65,221 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public member functions-----*/
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
-		mTestMode = false;
-		mShowPopup = false;
+		objDummy = (GameObject)Resources.Load("prefabDummy");
+		objText = (GameObject)Resources.Load("prefabText");
 		mMoney = 10000;
 		// class init
 		Rabbit.init();
 		JsonGene.init();
 		// style init
 		mEndCount = 0;
+		mSelling = false;
+		mRoomList = new List<Rabbit>();
 		mEndStyle.fontSize = 50;
 		mEndStyle.normal.background = new Texture2D(2, 2);
 		mDictStyle.fontSize = 50;
 		mDictStyle.normal.background = new Texture2D(2, 2);
-		mHelpStyle.fontSize = 50;
-		mHelpStyle.normal.background = new Texture2D(2, 2);
-		mPopupStyle.fontSize = 15;
-		mPopupStyle.normal.background = new Texture2D(2, 2);
+		mFieldArea = new Diamond(Camera.main.ScreenToWorldPoint(new Vector2(mSWidth * 0.5f, mSHeight * 0.5f)), mSWidth * 0.3f, mSHeight * 0.2f);
+		Rabbit.create(null, null);
+		mListCamera = GameObject.Find("List Camera").camera;
 		InvokeRepeating("rabbitCost", 6, 6);
 	}
 	
+	void offLight(){
+		GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = false;
+	}
+
 	void Update () {
-		if(Input.GetMouseButtonDown(0)){
-			// select rabbit
-			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
-			mShowPopup = (mTargetRabbit != null);
+		for(int i = 0; i < Rabbit.textList.Count; ++i){
+			try{
+				Rabbit.textList[i].GetComponent<TextMesh>().text = "수명 : " + Rabbit.rabbitList[i].life.ToString() + " / " + Rabbit.maxLife.ToString();
+				}catch{}
 		}
-		// move rabbit to LoveRoom
-		if(Input.GetMouseButtonDown(1)){
-			// select rabbit
-			mTargetRabbit = clickedObject("rabbit", delegate(GameObject input){return true;});
-			mShowPopup = (mTargetRabbit != null);
-			if(mTargetRabbit != null && mTargetRabbit.GetComponent<Rabbit>().isAdult){
-				// if rabbit is in LoveRoom, move rabbit to Random place on Farm
-				if(mTargetRabbit.GetComponent<Rabbit>().inRoom){
-					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-					mTargetRabbit.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
-																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
-					int tempIndex = mRoomList.IndexOf(mTargetRabbit);
-					mRoomList.Remove(mTargetRabbit);
-					for(int i = tempIndex; i < mRoomList.Count; ++i){
-						mRoomList[i].transform.position += new Vector3(0, Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit, 0);
+		if(Input.GetMouseButtonDown(0)){
+			GameObject selDum;
+			switch(mCurState){
+				case State.GAME :
+					mTarget = clickedObject(Camera.main, "rabbit", delegate(GameObject arg1){return true;});
+					break;
+				case State.MONEY :
+					selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
+					if(selDum != null && Rabbit.dummyList.IndexOf(selDum) != -1){
+						int index = Rabbit.dummyList.IndexOf(selDum);
+						DestroyImmediate(Rabbit.rabbitList[index].gameObject);
+						DestroyImmediate(Rabbit.dummyList[index]);
+						DestroyImmediate(Rabbit.textList[index]);
+						Rabbit.rabbitList.RemoveAt(index);
+						Rabbit.dummyList.RemoveAt(index);
+						Rabbit.textList.RemoveAt(index);
+						for(int i = index; i < Rabbit.dummyList.Count; ++i){
+							Rabbit.dummyList[i].transform.position = new Vector2(Rabbit.dummyList[i].transform.position.x,
+																				 Rabbit.dummyList[i].transform.position.y + sHeight * 0.1f);
+							Rabbit.textList[i].transform.position = new Vector2(Rabbit.textList[i].transform.position.x,
+																				Rabbit.textList[i].transform.position.y + sHeight * 0.1f);
+						}
+						mMoney += 200;
 					}
-					mTargetRabbit.GetComponent<Rabbit>().inRoom = false;
-					mTargetRabbit.GetComponent<Draggable>().noDrag = false;
-				}
-				// if rabbit is not in Love Room, move rabbit to LoveRoom
-				else if(mRoomList.Count < 2){
-					Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-					Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-					mTargetRabbit.transform.position = new Vector3(worldLeftBottom.x * 0.05f + worldRightTop.x * 0.95f,
-																   worldLeftBottom.y * 0.5f + worldRightTop.y * 0.5f -
-																   		Resources.LoadAll<Sprite>("txtrRabbit")[5].rect.height / pixToUnit * mRoomList.Count,
-																   0);
-					mRoomList.Add(mTargetRabbit);
-					mTargetRabbit.GetComponent<Rabbit>().inRoom = true;
-					mTargetRabbit.GetComponent<Draggable>().noDrag = true;
-				}
+					break;
+				case State.SELECT :
+					selDum = clickedObject(mListCamera, "dummy", delegate(GameObject arg1){return true;});
+					if(selDum != null && Rabbit.dummyList.IndexOf(selDum) != -1){
+						mTarget = Rabbit.rabbitList[Rabbit.dummyList.IndexOf(selDum)].gameObject;
+						foreach(GameObject element in Rabbit.dummyList){
+							DestroyImmediate(element);
+						}
+						foreach(GameObject element in Rabbit.textList){
+							DestroyImmediate(element);
+						}
+						Rabbit.dummyList.Clear();
+						Rabbit.textList.Clear();
+						mListCamera.enabled = false;
+						mCurState = State.GAME;
+						Time.timeScale = 1;
+						GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = true;
+						GameObject.Find("Light").transform.position = new Vector3(mTarget.transform.position.x, mTarget.transform.position.y, 2);
+						Invoke("offLight", 1);
+					}
+					break;
 			}
 		}
-		if (Input.GetMouseButtonUp (0)) {
-			if(mTargetRabbit != null){
-				GameObject anotherRabbit = clickedObject("rabbit", delegate(GameObject input){return input.GetComponent<Rabbit>() != mTargetRabbit;});
-				// in trash area
-				if(Input.mousePosition.x > mSWidth * 0.9f && Input.mousePosition.y < mSHeight * 0.1f && !mTargetRabbit.GetComponent<Rabbit>().inRoom){
-					Rabbit.rabbitList.Remove(mTargetRabbit.GetComponent<Rabbit>());
-					DestroyImmediate(mTargetRabbit);
-					mMoney += 200;
+		if(Input.GetMouseButtonUp(0)){
+			if(mTarget != null && GameObject.Find("House") == clickedObject(Camera.main, "house", delegate(GameObject arg1){return true;})){
+				if(mRoomList.Count <= 2){
+					mRoomList.Add(mTarget.GetComponent<Rabbit>());
 				}
-				// found rabbit with different gender & both are grown
-				else if(anotherRabbit != null && anotherRabbit.GetComponent<Rabbit>().gender != mTargetRabbit.GetComponent<Rabbit>().gender
-					 && anotherRabbit.GetComponent<Rabbit>().isAdult && mTargetRabbit.GetComponent<Rabbit>().isAdult){
-					if(mMoney >= 100 || mTestMode){
-						if(anotherRabbit.GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
-							Rabbit.create(anotherRabbit, mTargetRabbit);
-						}
-						else{
-							Rabbit.create(mTargetRabbit, anotherRabbit);
-						}
-						mMoney -= 100;
-					}
-				}
+			}
+			else if(mTarget != null && !mFieldArea.Contains(mTarget.transform.position)){
+				Rabbit.rabbitList.Remove(mTarget.GetComponent<Rabbit>());
+				DestroyImmediate(mTarget);
+				mMoney += 200;
 			}
 		}
 	}
 
+	void OnDrawGizmos(){
+		Gizmos.DrawLine(mFieldArea.left(), mFieldArea.top());
+		Gizmos.DrawLine(mFieldArea.top(), mFieldArea.right());
+		Gizmos.DrawLine(mFieldArea.right(), mFieldArea.bottom());
+		Gizmos.DrawLine(mFieldArea.bottom(), mFieldArea.left());
+	}
+
 	void OnGUI(){
-		// money - text
-		if(mMoney >= 0){
-			mMoneyStyle.normal.textColor = Color.white;
-		}
-		else{
-			mMoneyStyle.normal.textColor = Color.red;
-		}
-		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString(), mMoneyStyle);
-		// test mode - text
-		if(mTestMode){
-			GUI.Label (new Rect(mSWidth * 0.05f, mSHeight * 0.16f, mSWidth * 0.1f, mSHeight * 0.1f), "test mode");
-		}
-		// trash
-		GUI.Label (new Rect (mSWidth * 0.9f, mSHeight * 0.9f, mSWidth * 0.1f, mSHeight * 0.1f), "trash", mPopupStyle);
-		// return button	
-		if (GUI.Button (new Rect (mSWidth * 0.0f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Return") && (mCurState == State.GAME)) {
-			Application.LoadLevel("sceneLevelSelect");
-		}
-		// dict button
-		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == State.GAME)) {
-			mCurState = State.DICT;
-			Time.timeScale = 0; // stop game time
-		}
-		// help button
-		if (GUI.Button (new Rect (mSWidth * 0.2f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Help") && (mCurState == State.GAME)) {
-			mCurState = State.HELP;
-			Time.timeScale = 0; // stop game time
-		}
-		// buy button
-		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == State.GAME)) {
-			if(mMoney >= 200 || mTestMode){
-				Rabbit.create(null, null);
-				mMoney -= 200;
+		if(GUI.Button(new Rect(mSWidth * 0.1f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), mMoney.ToString() + "G(-" + (Rabbit.rabbitList.Count * maintenanceCost).ToString() + ")") && (mCurState == State.GAME)){
+			mCurState = State.MONEY;
+			mListCamera.transform.position = new Vector3(700, 0, -10);
+			foreach(Rabbit element in Rabbit.rabbitList){
+				Rabbit.createDummy(element);
 			}
-		}
-		// test mode button
-		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Test Mode") && (mCurState == State.GAME)){
-			mTestMode = !mTestMode;
-		}
-		if(mRoomList.Count >= 2){
-			if(GUI.Button (new Rect (mSWidth * 0.5f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Reproduce") && (mCurState == State.GAME)){
-				if(mRoomList[0].GetComponent<Rabbit>().gender != mRoomList[1].GetComponent<Rabbit>().gender){
-					if(mRoomList[0].GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
-						Rabbit.create(mRoomList[0].gameObject, mRoomList[1].gameObject);
-					}
-					else{
-						Rabbit.create(mRoomList[1].gameObject, mRoomList[0].gameObject);
-					}
-				}
-				Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-				Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-				foreach(GameObject element in mRoomList){
-					element.transform.position = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
-																   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
-					element.GetComponent<Rabbit>().inRoom = false;
-					element.GetComponent<Draggable>().noDrag = false;
-				}
-				mRoomList.Clear();
+			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+				Vector3 newPos = new Vector3(700 - mSWidth * 0.2f + mSWidth * 0.05f, 0 + mSHeight * 0.1f - mSHeight * (0.05f + 0.1f * i), 0);
+				Rabbit.dummyList[i].transform.position = new Vector3(newPos.x, newPos.y, 0);
+				Rabbit.textList[i].transform.position = new Vector3(newPos.x + mSWidth * 0.2f, newPos.y, 0);
 			}
-		}
-		// in dict mode
-		if (mCurState == State.DICT) {
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Dictionary", mDictStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = State.GAME;
-				Time.timeScale = 1; // resume game
-			}
-		}
-		// in help mode
-		else if (mCurState == State.HELP) {
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Help", mHelpStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = State.GAME;
-				Time.timeScale = 1; // resume game
-			}
-		}
-		// game over
-		if(mEndCount >= mMaxEndCount){
+			mListCamera.enabled = true;
 			Time.timeScale = 0;
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Game Over", mEndStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				Time.timeScale = 1; // resume game
-				Application.LoadLevel("sceneLevelSelect");
-			}
 		}
-		// popup
-		mShowPopup &= mTargetRabbit != null;
-		if(mShowPopup){
-			string popupText = "";
-			// basic information
-			popupText += ("ID : " + mTargetRabbit.GetComponent<Rabbit>().id + "\n");
-			popupText += ("name : (none)\n");
-			popupText += ("life : " + mTargetRabbit.GetComponent<Rabbit>().life + "\n");
-			popupText += ("gender : " + (mTargetRabbit.GetComponent<Rabbit>().isAdult ? mTargetRabbit.GetComponent<Rabbit>().gender.ToString() : "???") + "\n");
-			// add all gene's text in geneList
-			for(int i = 0; i < mTargetRabbit.GetComponent<Gene>().list.Count; ++i){
-				popupText += mTargetRabbit.GetComponent<Gene>().list[i].name + " : ";
-				if(mTargetRabbit.GetComponent<Rabbit>().isAdult){
-					for(int j = 0; j < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(0); ++j){
-						for(int k = 0; k < mTargetRabbit.GetComponent<Gene>().list[i].factor.GetLength(1); ++k){
-							popupText += mTargetRabbit.GetComponent<Gene>().list[i].factor[j, k];
+		if(GUI.Button(new Rect(mSWidth * 0.3f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), Rabbit.rabbitList.Count.ToString() + "마리") && (mCurState == State.GAME)){
+			mCurState = State.SELECT;
+			mListCamera.transform.position = new Vector3(700, 0, -10);
+			foreach(Rabbit element in Rabbit.rabbitList){
+				Rabbit.createDummy(element);
+			}
+			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+				Vector3 newPos = new Vector3(700 - mSWidth * 0.2f + mSWidth * 0.05f, 0 + mSHeight * 0.1f - mSHeight * (0.05f + 0.1f * i), 0);
+				Rabbit.dummyList[i].transform.position = new Vector3(newPos.x, newPos.y, 0);
+				Rabbit.textList[i].transform.position = new Vector3(newPos.x + mSWidth * 0.2f, newPos.y, 0);
+			}
+			mListCamera.enabled = true;
+			Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.5f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "도감") && (mCurState == State.GAME)){
+			//mCurState = State.DICT;
+			//Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "상점") && (mCurState == State.GAME)){
+			Rabbit.create(null, null);
+			//mCurState = State.STORE;
+			//Time.timeScale = 0;
+		}
+		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.15f, mSWidth * 0.15f, mSHeight * 0.1f), "메뉴") && (mCurState == State.GAME)){
+			//mCurState = State.MENU;
+			//Time.timeScale = 0;
+		}
+		switch(mCurState){
+			case State.GAME :
+				if(mRoomList.Count >= 2){
+					if(GUI.Button(new Rect(mSWidth * 0.9f, mSHeight * 0.6f, mSWidth * 0.05f, mSHeight * 0.05f), "!!!")){
+						if(mRoomList[0].gender != mRoomList[1].gender){
+							if(mRoomList[0].gender == Rabbit.Gender.MALE){
+								Rabbit.create(mRoomList[0].gameObject, mRoomList[1].gameObject);
+							}
+							else{
+								Rabbit.create(mRoomList[1].gameObject, mRoomList[0].gameObject);
+							}
 						}
-						popupText += ", ";
+						mRoomList[0].gameObject.transform.position = new Vector2(0, 0);
+						mRoomList[1].gameObject.transform.position = new Vector2(0, 0);
+						mRoomList.Clear();
 					}
-					// remove last comma
-					popupText = popupText.Remove(popupText.Length - 2, 2);
 				}
-				// don't show genes when rabbit is not grown
-				else{
-					popupText += "???";
+				break;
+			case State.MONEY :
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.1f, mSWidth * 0.2f, mSHeight * 0.1f), "↑")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y + mSHeight * 0.1f, -10);
 				}
-				popupText += "\n";
-			}
-			GUI.Label (new Rect(mSWidth * 0.75f, mSHeight * 0.0f, mSWidth * 0.25f, mSHeight * 0.5f), popupText, mPopupStyle);
-			// popup close button
-			if(GUI.Button (new Rect(mSWidth * 0.925f, mSHeight * 0.025f, mSWidth * 0.05f, mSHeight * 0.05f), "close")){
-				mShowPopup = false;
-			}
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.8f, mSWidth * 0.2f, mSHeight * 0.1f), "↓")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y - mSHeight * 0.1f, -10);
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.6f, mSHeight * 0.15f, mSWidth * 0.05f, mSHeight * 0.05f), "X")){
+					foreach(GameObject element in Rabbit.dummyList){
+						DestroyImmediate(element);
+					}
+					foreach(GameObject element in Rabbit.textList){
+						DestroyImmediate(element);
+					}
+					Rabbit.textList.Clear();
+					Rabbit.dummyList.Clear();
+					mListCamera.enabled = false;
+					mCurState = State.GAME;
+					Time.timeScale = 1;
+				}
+				break;
+			case State.SELECT :
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.1f, mSWidth * 0.2f, mSHeight * 0.1f), "↑")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y + mSHeight * 0.1f, -10);
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.4f, mSHeight * 0.8f, mSWidth * 0.2f, mSHeight * 0.1f), "↓")){
+					mListCamera.transform.position = new Vector3(mListCamera.transform.position.x, mListCamera.transform.position.y - mSHeight * 0.1f, -10);
+				}
+				if(GUI.Button(new Rect(mSWidth * 0.6f, mSHeight * 0.15f, mSWidth * 0.05f, mSHeight * 0.05f), "X")){
+					foreach(GameObject element in Rabbit.dummyList){
+						DestroyImmediate(element);
+					}
+					foreach(GameObject element in Rabbit.textList){
+						DestroyImmediate(element);
+					}
+					Rabbit.textList.Clear();
+					Rabbit.dummyList.Clear();
+					mListCamera.enabled = false;
+					mCurState = State.GAME;
+					Time.timeScale = 1;
+				}
+				break;
+			case State.DICT :
+				break;
+			case State.STORE :
+				break;
+			case State.MENU :
+				break;
 		}
 	}
 
 	void rabbitCost(){
-		mMoney -= Rabbit.rabbitList.Count * 100;
+		mMoney -= Rabbit.rabbitList.Count * maintenanceCost;
 		if(mMoney < 0){
 			mEndCount++;
 		}
-		else if(0 < mEndCount && mEndCount < mMaxEndCount && !mTestMode){
+		else if(0 < mEndCount && mEndCount < mMaxEndCount){
 			mEndCount--;
 		}
 	}

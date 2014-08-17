@@ -12,6 +12,8 @@ public class Rabbit : MonoBehaviour {
 	
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
+	public static List<GameObject> dummyList = new List<GameObject>();
+	public static List<GameObject> textList = new List<GameObject>();
 	public static Sprite[ , ] headList = new Sprite[3, 5];
 	public static Sprite[ , ] bodyList = new Sprite[4, 5];
 	public static Sprite[] tailList = new Sprite[5];
@@ -59,7 +61,9 @@ public class Rabbit : MonoBehaviour {
 	private int mId;
 	private Gender mGender;
 	private Color mColor = new Color(1, 1, 1);
-	private Sprite[] mSprite = new Sprite[5];
+	public Sprite[] mSprite = new Sprite[5];
+	public Rabbit mFather = null;
+	public Rabbit mMother = null;
 	
 	/*-----public static functions-----*/
 	public static void init(){
@@ -114,17 +118,38 @@ public class Rabbit : MonoBehaviour {
 
 	public static void create(GameObject father, GameObject mother){
 		// select position of new rabbit
-		Vector3 worldLeftBottom = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-		Vector3 worldRightTop = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.9f, Screen.height * 0.9f, 0));
-		Vector3 tempPosition = new Vector3(Random.Range (worldLeftBottom.x, worldRightTop.x),
-		                                   Random.Range (worldLeftBottom.y, worldRightTop.y), 0);
+		Vector2 tempPosition = (Vector2)Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, tempPosition, Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
 		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
+		try{
+			newRabbit.GetComponent<Rabbit>().mFather = father.GetComponent<Rabbit>();
+		}catch{}
+		try{
+			newRabbit.GetComponent<Rabbit>().mMother = mother.GetComponent<Rabbit>();
+		}catch{}
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit.GetComponent<Rabbit>());
+	}
+
+	public static void createDummy(Rabbit original){
+		GameObject newDummy = (GameObject)Instantiate(scriptFarm.objDummy, new Vector2(700, 0), Quaternion.identity);
+		newDummy.transform.Find("Head").GetComponent<SpriteRenderer>().sprite = original.mSprite[0];
+		newDummy.transform.Find("Head").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Body").GetComponent<SpriteRenderer>().sprite = original.mSprite[1];
+		newDummy.transform.Find("Body").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = original.mSprite[2];
+		newDummy.transform.Find("Tail").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = original.mSprite[3];
+		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
+		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		GameObject newText = (GameObject)Instantiate(scriptFarm.objText, new Vector2(700, 0), Quaternion.identity);
+		newText.GetComponent<TextMesh>().text = "수명 : " + original.life.ToString() + " / " + maxLife.ToString();
+		dummyList.Add(newDummy);
+		textList.Add(newText);
 	}
 	
 	/*-----public member functions-----*/
@@ -143,16 +168,19 @@ public class Rabbit : MonoBehaviour {
 		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
 		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		Invoke("grow", 5);
+		InvokeRepeating("decLife", 0.01f, 0.01f);
+	}
+
+	void decLife(){
+		if(--mLife <= 0){
+			rabbitList.Remove(this);
+			DestroyImmediate(this.gameObject);
+		}
 	}
 	
 	// Update is called once per frame
 	void Update() {
 		// Rabbit Jump Loop
-		if(--mLife <= 0){
-			rabbitList.Remove(this);
-			DestroyImmediate(this.gameObject);
-			return;
-		}
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
