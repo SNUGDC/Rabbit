@@ -13,6 +13,7 @@ public class Rabbit : MonoBehaviour {
 	/*-----public static variables-----*/
 	public static List<Rabbit> rabbitList = new List<Rabbit>();
 	public static List<GameObject> dummyList = new List<GameObject>();
+	public static List<GameObject> textList = new List<GameObject>();
 	public static Sprite[ , ] headList = new Sprite[3, 5];
 	public static Sprite[ , ] bodyList = new Sprite[4, 5];
 	public static Sprite[] tailList = new Sprite[5];
@@ -145,7 +146,10 @@ public class Rabbit : MonoBehaviour {
 		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
 		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
 		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		GameObject newText = (GameObject)Instantiate(scriptFarm.objText, new Vector2(700, 0), Quaternion.identity);
+		newText.GetComponent<TextMesh>().text = "수명 : " + original.life.ToString() + " / " + maxLife.ToString();
 		dummyList.Add(newDummy);
+		textList.Add(newText);
 	}
 	
 	/*-----public member functions-----*/
@@ -164,16 +168,19 @@ public class Rabbit : MonoBehaviour {
 		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
 		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		Invoke("grow", 5);
+		InvokeRepeating("decLife", 0.01f, 0.01f);
+	}
+
+	void decLife(){
+		if(--mLife <= 0){
+			rabbitList.Remove(this);
+			DestroyImmediate(this.gameObject);
+		}
 	}
 	
 	// Update is called once per frame
 	void Update() {
 		// Rabbit Jump Loop
-		if(--mLife <= 0){
-			rabbitList.Remove(this);
-			DestroyImmediate(this.gameObject);
-			return;
-		}
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];

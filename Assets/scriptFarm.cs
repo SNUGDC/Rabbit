@@ -7,6 +7,7 @@ public class scriptFarm : MonoBehaviour {
 	/*-----readonly variables-----*/
 	public static readonly uint mMaxEndCount = 7;
 	public static readonly uint pixToUnit = 30;
+	public static readonly uint maintenanceCost = 100;
 
 	/*-----public data types-----*/
 	public enum State {GAME, MONEY, SELECT, DICT, MENU, STORE};
@@ -14,6 +15,7 @@ public class scriptFarm : MonoBehaviour {
 	/*-----public static variables-----*/
 	public static GameObject objRabbit;
 	public static GameObject objDummy;
+	public static GameObject objText;
 	public static int sWidth{
 		get{
 			return mSWidth;
@@ -64,6 +66,7 @@ public class scriptFarm : MonoBehaviour {
 	void Start () {
 		objRabbit = (GameObject)Resources.Load("prefabRabbit");
 		objDummy = (GameObject)Resources.Load("prefabDummy");
+		objText = (GameObject)Resources.Load("prefabText");
 		mMoney = 10000;
 		// class init
 		Rabbit.init();
@@ -87,6 +90,11 @@ public class scriptFarm : MonoBehaviour {
 	}
 
 	void Update () {
+		for(int i = 0; i < Rabbit.textList.Count; ++i){
+			try{
+				Rabbit.textList[i].GetComponent<TextMesh>().text = "수명 : " + Rabbit.rabbitList[i].life.ToString() + " / " + Rabbit.maxLife.ToString();
+				}catch{}
+		}
 		if(Input.GetMouseButtonDown(0)){
 			GameObject selDum;
 			switch(mCurState){
@@ -99,11 +107,15 @@ public class scriptFarm : MonoBehaviour {
 						int index = Rabbit.dummyList.IndexOf(selDum);
 						DestroyImmediate(Rabbit.rabbitList[index].gameObject);
 						DestroyImmediate(Rabbit.dummyList[index]);
+						DestroyImmediate(Rabbit.textList[index]);
 						Rabbit.rabbitList.RemoveAt(index);
 						Rabbit.dummyList.RemoveAt(index);
+						Rabbit.textList.RemoveAt(index);
 						for(int i = index; i < Rabbit.dummyList.Count; ++i){
 							Rabbit.dummyList[i].transform.position = new Vector2(Rabbit.dummyList[i].transform.position.x,
 																				 Rabbit.dummyList[i].transform.position.y + sHeight * 0.1f);
+							Rabbit.textList[i].transform.position = new Vector2(Rabbit.textList[i].transform.position.x,
+																				Rabbit.textList[i].transform.position.y + sHeight * 0.1f);
 						}
 						mMoney += 200;
 					}
@@ -115,7 +127,11 @@ public class scriptFarm : MonoBehaviour {
 						foreach(GameObject element in Rabbit.dummyList){
 							DestroyImmediate(element);
 						}
+						foreach(GameObject element in Rabbit.textList){
+							DestroyImmediate(element);
+						}
 						Rabbit.dummyList.Clear();
+						Rabbit.textList.Clear();
 						mListCamera.enabled = false;
 						mCurState = State.GAME;
 						Time.timeScale = 1;
@@ -148,15 +164,16 @@ public class scriptFarm : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		if(GUI.Button(new Rect(mSWidth * 0.1f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), mMoney.ToString() + "G") && (mCurState == State.GAME)){
+		if(GUI.Button(new Rect(mSWidth * 0.1f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), mMoney.ToString() + "G(-" + (Rabbit.rabbitList.Count * maintenanceCost).ToString() + ")") && (mCurState == State.GAME)){
 			mCurState = State.MONEY;
 			mListCamera.transform.position = new Vector3(700, 0, -10);
 			foreach(Rabbit element in Rabbit.rabbitList){
 				Rabbit.createDummy(element);
 			}
 			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
-				Rabbit.dummyList[i].transform.position = new Vector3(700 - mSWidth * 0.3f + mSWidth * 0.05f,
-																	 0 + mSHeight * 0.3f - mSHeight * (0.05f + 0.1f * i), 0);
+				Vector3 newPos = new Vector3(700 - mSWidth * 0.2f + mSWidth * 0.05f, 0 + mSHeight * 0.1f - mSHeight * (0.05f + 0.1f * i), 0);
+				Rabbit.dummyList[i].transform.position = new Vector3(newPos.x, newPos.y, 0);
+				Rabbit.textList[i].transform.position = new Vector3(newPos.x + mSWidth * 0.2f, newPos.y, 0);
 			}
 			mListCamera.enabled = true;
 			Time.timeScale = 0;
@@ -168,15 +185,16 @@ public class scriptFarm : MonoBehaviour {
 				Rabbit.createDummy(element);
 			}
 			for(int i = 0; i < Rabbit.dummyList.Count; ++i){
-				Rabbit.dummyList[i].transform.position = new Vector3(700 - mSWidth * 0.3f + mSWidth * 0.05f,
-																	 0 + mSHeight * 0.3f - mSHeight * (0.05f + 0.1f * i), 0);
+				Vector3 newPos = new Vector3(700 - mSWidth * 0.2f + mSWidth * 0.05f, 0 + mSHeight * 0.1f - mSHeight * (0.05f + 0.1f * i), 0);
+				Rabbit.dummyList[i].transform.position = new Vector3(newPos.x, newPos.y, 0);
+				Rabbit.textList[i].transform.position = new Vector3(newPos.x + mSWidth * 0.2f, newPos.y, 0);
 			}
 			mListCamera.enabled = true;
 			Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.5f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "도감") && (mCurState == State.GAME)){
-			mCurState = State.DICT;
-			Time.timeScale = 0;
+			//mCurState = State.DICT;
+			//Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.05f, mSWidth * 0.15f, mSHeight * 0.1f), "상점") && (mCurState == State.GAME)){
 			Rabbit.create(null, null);
@@ -184,8 +202,8 @@ public class scriptFarm : MonoBehaviour {
 			//Time.timeScale = 0;
 		}
 		if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.15f, mSWidth * 0.15f, mSHeight * 0.1f), "메뉴") && (mCurState == State.GAME)){
-			mCurState = State.MENU;
-			Time.timeScale = 0;
+			//mCurState = State.MENU;
+			//Time.timeScale = 0;
 		}
 		switch(mCurState){
 			case State.GAME :
@@ -216,6 +234,10 @@ public class scriptFarm : MonoBehaviour {
 					foreach(GameObject element in Rabbit.dummyList){
 						DestroyImmediate(element);
 					}
+					foreach(GameObject element in Rabbit.textList){
+						DestroyImmediate(element);
+					}
+					Rabbit.textList.Clear();
 					Rabbit.dummyList.Clear();
 					mListCamera.enabled = false;
 					mCurState = State.GAME;
@@ -233,6 +255,10 @@ public class scriptFarm : MonoBehaviour {
 					foreach(GameObject element in Rabbit.dummyList){
 						DestroyImmediate(element);
 					}
+					foreach(GameObject element in Rabbit.textList){
+						DestroyImmediate(element);
+					}
+					Rabbit.textList.Clear();
 					Rabbit.dummyList.Clear();
 					mListCamera.enabled = false;
 					mCurState = State.GAME;
@@ -246,49 +272,10 @@ public class scriptFarm : MonoBehaviour {
 			case State.MENU :
 				break;
 		}
-		/*
-		// money - text
-		if(mMoney >= 0){
-			mMoneyStyle.normal.textColor = Color.white;
-		}
-		else{
-			mMoneyStyle.normal.textColor = Color.red;
-		}
-		GUI.Label (new Rect (mSWidth * 0.05f, mSHeight * 0.13f, mSWidth * 0.1f, mSHeight * 0.1f), "money : " + mMoney.ToString(), mMoneyStyle);
-		// dict button
-		if (GUI.Button (new Rect (mSWidth * 0.1f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Dictionary") && (mCurState == State.GAME)) {
-			mCurState = State.DICT;
-			Time.timeScale = 0; // stop game time
-		}
-		// buy button
-		if (GUI.Button (new Rect (mSWidth * 0.3f, mSHeight * 0.0f, mSWidth * 0.1f, mSHeight * 0.1f), "Buy") && (mCurState == State.GAME)) {
-			if(mMoney >= 200){
-				Rabbit.create(null, null);
-				mMoney -= 200;
-			}
-		}
-		// in dict mode
-		if (mCurState == State.DICT) {
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Dictionary", mDictStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				mCurState = State.GAME;
-				Time.timeScale = 1; // resume game
-			}
-		}
-		// game over
-		if(mEndCount >= mMaxEndCount){
-			Time.timeScale = 0;
-			GUI.Label(new Rect(mSWidth * 0.1f, mSHeight * 0.1f, mSWidth * 0.8f, mSHeight * 0.8f), "Game Over", mEndStyle);
-			if(GUI.Button(new Rect(mSWidth * 0.7f, mSHeight * 0.7f, mSWidth * 0.1f, mSHeight * 0.1f), "return")){
-				Time.timeScale = 1; // resume game
-				Application.LoadLevel("sceneLevelSelect");
-			}
-		}
-		*/
 	}
 
 	void rabbitCost(){
-		mMoney -= Rabbit.rabbitList.Count * 100;
+		mMoney -= Rabbit.rabbitList.Count * maintenanceCost;
 		if(mMoney < 0){
 			mEndCount++;
 		}
