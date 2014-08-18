@@ -9,6 +9,8 @@ public class scriptFarm : MonoBehaviour {
 	private static readonly int COST_MAINTENANCE = 200;
 
 	public static GameObject objRabbit;
+	public static GameObject objDummy;
+	public static GameObject objText;
 
 	private int mMoney;
 	private State mCurState;
@@ -18,6 +20,8 @@ public class scriptFarm : MonoBehaviour {
 
 	void Start(){
 		objRabbit = Resources.Load<GameObject>("prefabRabbit");
+		objDummy = Resources.Load<GameObject>("prefabDummy");
+		objText = Resources.Load<GameObject>("prefabText");
 		mMoney = MONEY_START;
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
