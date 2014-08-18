@@ -6,6 +6,7 @@ public class scriptFarm : MonoBehaviour {
 	public enum State{MAIN, MONEY, COUNT, STORE};
 
 	private static readonly int MONEY_START = 10000;
+	private static readonly int COST_MAINTENANCE = 200;
 
 	private int mMoney;
 	private State mCurState;
@@ -33,16 +34,19 @@ public class scriptFarm : MonoBehaviour {
 									case "MoneyButton" :
 										mCurState = State.MONEY;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.gameObject.transform.position = new Vector3(700, 0, -10);
 										mCurCam.enabled = true;
 										break;
 									case "CountButton" :
 										mCurState = State.COUNT;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.gameObject.transform.position = new Vector3(1400, 0, -10);
 										mCurCam.enabled = true;
 										break;
 									case "StoreButton" :
 										mCurState = State.STORE;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.gameObject.transform.position = new Vector3(2100, 0, -10);
 										mCurCam.enabled = true;
 										break;
 								}
@@ -90,6 +94,12 @@ public class scriptFarm : MonoBehaviour {
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
 										break;
+									case "BuyIcon" :
+										Rabbit.create(null, null);
+										mCurState = State.MAIN;
+										mCurCam.enabled = false;
+										mCurCam = Camera.main;
+										break;
 								}
 								break;
 							case "Dummy" :
@@ -104,7 +114,8 @@ public class scriptFarm : MonoBehaviour {
 		}
 		// updating texts
 		GameObject.Find("MoneyButton").transform.
-				   Find("Text").GetComponent<TextMesh>().text = mMoney.ToString() + "G" + "(-" + 0.ToString() + "G)";
+				   Find("Text").GetComponent<TextMesh>().text = mMoney.ToString() + "G" + "(-"
+				   											  + (Rabbit.rabbitList.Count * COST_MAINTENANCE).ToString() + "G)";
 		GameObject.Find("CountButton").transform.
 				   Find("Text").GetComponent<TextMesh>().text = Rabbit.rabbitList.Count.ToString() + "마리";
 	}

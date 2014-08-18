@@ -9,6 +9,10 @@ public class Rabbit : MonoBehaviour {
 		rabbitList = new List<GameObject>();
 	}
 
+	public static void create(GameObject father, GameObject mother){
+		print("new Rabbit!");
+	}
+
 	void Start(){
 
 	}
