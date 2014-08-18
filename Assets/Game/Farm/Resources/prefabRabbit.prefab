@@ -16,7 +16,7 @@ GameObject:
   - 114: {fileID: 11400006}
   m_Layer: 9
   m_Name: prefabRabbit
-  m_TagString: rabbit
+  m_TagString: Rabbit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -215,6 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d32a41187794a249871eef47884f662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mFather: {fileID: 0}
+  mMother: {fileID: 0}
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
