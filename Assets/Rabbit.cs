@@ -25,6 +25,11 @@ public class Rabbit : MonoBehaviour {
 		rabbitList.Add(newRabbit);
 	}
 
+	public static void remove(GameObject input){
+		rabbitList.Remove(input);
+		Destroy(input);
+	}
+
 	public Rabbit mFather = null;
 	public Rabbit mMother = null;
 	

@@ -62,8 +62,7 @@ public class scriptFarm : MonoBehaviour {
 						if(mSelObj.tag == "Rabbit"){
 							mSelObj.GetComponent<Draggable>().select = false;
 							if(!mFieldArea.Contains(mSelObj.transform.position)){
-								Rabbit.rabbitList.Remove(mSelObj);
-								Destroy(mSelObj);
+								Rabbit.remove(mSelObj);
 							}
 						}
 						switch(mUpObj.tag){
