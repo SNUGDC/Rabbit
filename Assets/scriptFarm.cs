@@ -23,6 +23,7 @@ public class scriptFarm : MonoBehaviour {
 		mCurState = State.MAIN;
 		// make field area from experience
 		mFieldArea = new Diamond(new Vector2(0, 9), 170, 87);
+		JsonGene.init();
 		Rabbit.init();
 	}
 	void Update(){
