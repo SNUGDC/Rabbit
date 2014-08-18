@@ -14,12 +14,15 @@ public class scriptFarm : MonoBehaviour {
 	private State mCurState;
 	private Camera mCurCam;
 	private GameObject mSelObj;
+	private Diamond mFieldArea;
 
 	void Start(){
 		objRabbit = Resources.Load<GameObject>("prefabRabbit");
 		mMoney = MONEY_START;
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
+		// make field area from experience
+		mFieldArea = new Diamond(new Vector2(0, 9), 170, 87);
 		Rabbit.init();
 	}
 	void Update(){
@@ -52,12 +55,20 @@ public class scriptFarm : MonoBehaviour {
 		if(Input.GetMouseButtonUp(0)){
 			Vector2 ray = mCurCam.ScreenToWorldPoint(Input.mousePosition);
 			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
-			if(hit.collider != null && mSelObj == hit.collider.gameObject){
+			GameObject mUpObj = (hit.collider == null) ? null : hit.collider.gameObject;
+			if(mUpObj != null){
 				switch(mCurState){
 					case State.MAIN :
-						switch(mSelObj.tag){
+						if(mSelObj.tag == "Rabbit"){
+							mSelObj.GetComponent<Draggable>().select = false;
+							if(!mFieldArea.Contains(mSelObj.transform.position)){
+								Rabbit.rabbitList.Remove(mSelObj);
+								Destroy(mSelObj);
+							}
+						}
+						switch(mUpObj.tag){
 							case "GUI" :
-								switch(mSelObj.name){
+								switch(mUpObj.name){
 									case "MoneyButton" :
 										mCurState = State.MONEY;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
@@ -78,15 +89,12 @@ public class scriptFarm : MonoBehaviour {
 										break;
 								}
 								break;
-							case "Rabbit" :
-								mSelObj.GetComponent<Draggable>().select = false;
-								break;
 						}
 						break;
 					case State.MONEY :
-						switch(mSelObj.tag){
+						switch(mUpObj.tag){
 							case "GUI" :
-								switch(mSelObj.name){
+								switch(mUpObj.name){
 									case "ExitButton" :
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
@@ -99,9 +107,9 @@ public class scriptFarm : MonoBehaviour {
 						}
 						break;
 					case State.COUNT :
-						switch(mSelObj.tag){
+						switch(mUpObj.tag){
 							case "GUI" :
-								switch(mSelObj.name){
+								switch(mUpObj.name){
 									case "ExitButton" :
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
@@ -114,9 +122,9 @@ public class scriptFarm : MonoBehaviour {
 						}
 						break;
 					case State.STORE :
-						switch(mSelObj.tag){
+						switch(mUpObj.tag){
 							case "GUI" :
-								switch(mSelObj.name){
+								switch(mUpObj.name){
 									case "ExitButton" :
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
@@ -136,9 +144,7 @@ public class scriptFarm : MonoBehaviour {
 						break;
 				}
 			}
-			else if(mSelObj != null && mCurState == State.MAIN && mSelObj.tag == "Rabbit"){
-				mSelObj.GetComponent<Draggable>().select = false;
-			}
+			mSelObj = null;
 		}
 		// updating texts
 		GameObject.Find("MoneyButton").transform.
@@ -147,4 +153,16 @@ public class scriptFarm : MonoBehaviour {
 		GameObject.Find("CountButton").transform.
 				   Find("Text").GetComponent<TextMesh>().text = Rabbit.rabbitList.Count.ToString() + "마리";
 	}
+
+// for field area test
+/*
+	void OnDrawGizmos(){
+		Gizmos.DrawLine(mFieldArea.top(), mFieldArea.right());
+		Gizmos.DrawLine(mFieldArea.right(), mFieldArea.bottom());
+		Gizmos.DrawLine(mFieldArea.bottom(), mFieldArea.left());
+		Gizmos.DrawLine(mFieldArea.left(), mFieldArea.top());
+		Gizmos.DrawLine(mFieldArea.left(), mFieldArea.right());
+		Gizmos.DrawLine(mFieldArea.top(), mFieldArea.bottom());
+	}
+*/
 }
