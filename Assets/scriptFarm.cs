@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class scriptFarm : MonoBehaviour {
+	public enum State{MAIN, MONEY, COUNT, STORE};
+
+	State mCurState;
 	Camera mCurCam;
 
 	public static GameObject clickedObject(Camera cam, string tag, System.Func<GameObject, bool> condition){
@@ -20,6 +23,7 @@ public class scriptFarm : MonoBehaviour {
 
 	void Start(){
 		mCurCam = Camera.main;
+		mCurState = State.MAIN;
 	}
 	void Update(){
 		if(Input.GetMouseButtonDown(0)){
@@ -27,12 +31,32 @@ public class scriptFarm : MonoBehaviour {
 			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
 			if(hit.collider != null){
 				GameObject selected = hit.collider.gameObject;
-				switch(selected.tag){
-					case "gui" :
-						print("gui!");
+				switch(mCurState){
+					case State.MAIN :
+						switch(selected.tag){
+							case "gui" :
+								switch(selected.name){
+									case "MoneyButton" :
+										break;
+									case "CountButton" :
+										break;
+									case "BuyButton" :
+										break;
+									default :
+										print("unkown gui!");
+										break;
+								}
+								break;
+							default :
+								print("click!");
+								break;
+						}
 						break;
-					default :
-						print("click!");
+					case State.MONEY :
+						break;
+					case State.COUNT :
+						break;
+					case State.STORE :
 						break;
 				}
 			}
