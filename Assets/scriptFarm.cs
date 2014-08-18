@@ -41,6 +41,8 @@ public class scriptFarm : MonoBehaviour {
 										break;
 								}
 								break;
+							case "Rabbit" :
+								break;
 						}
 						break;
 					case State.MONEY :
