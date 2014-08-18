@@ -5,15 +5,21 @@ using System.Collections.Generic;
 public class scriptFarm : MonoBehaviour {
 	public enum State{MAIN, MONEY, COUNT, STORE};
 
-	State mCurState;
-	Camera mCurCam;
-	GameObject mSelObj;
+	private static readonly int MONEY_START = 10000;
+
+	private int mMoney;
+	private State mCurState;
+	private Camera mCurCam;
+	private GameObject mSelObj;
 
 	void Start(){
+		mMoney = MONEY_START;
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
+		Rabbit.init();
 	}
 	void Update(){
+		// for inputs
 		if(Input.GetMouseButtonDown(0)){
 			Vector2 ray = mCurCam.ScreenToWorldPoint(Input.mousePosition);
 			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
@@ -56,6 +62,8 @@ public class scriptFarm : MonoBehaviour {
 										break;
 								}
 								break;
+							case "Dummy" :
+								break;
 						}
 						break;
 					case State.COUNT :
@@ -68,6 +76,8 @@ public class scriptFarm : MonoBehaviour {
 										mCurCam = Camera.main;
 										break;
 								}
+								break;
+							case "Dummy" :
 								break;
 						}
 						break;
@@ -82,6 +92,8 @@ public class scriptFarm : MonoBehaviour {
 										break;
 								}
 								break;
+							case "Dummy" :
+								break;
 						}
 						break;
 				}
@@ -90,5 +102,10 @@ public class scriptFarm : MonoBehaviour {
 				mSelObj = null;
 			}
 		}
+		// updating texts
+		GameObject.Find("MoneyButton").transform.
+				   Find("Text").GetComponent<TextMesh>().text = mMoney.ToString() + "G" + "(-" + 0.ToString() + "G)";
+		GameObject.Find("CountButton").transform.
+				   Find("Text").GetComponent<TextMesh>().text = Rabbit.rabbitList.Count.ToString() + "마리";
 	}
 }
