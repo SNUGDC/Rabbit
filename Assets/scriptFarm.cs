@@ -37,26 +37,62 @@ public class scriptFarm : MonoBehaviour {
 							case "gui" :
 								switch(selected.name){
 									case "MoneyButton" :
+										mCurState = State.MONEY;
+										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.enabled = true;
 										break;
 									case "CountButton" :
+										mCurState = State.COUNT;
+										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.enabled = true;
 										break;
-									case "BuyButton" :
-										break;
-									default :
-										print("unkown gui!");
+									case "StoreButton" :
+										mCurState = State.STORE;
+										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
+										mCurCam.enabled = true;
 										break;
 								}
-								break;
-							default :
-								print("click!");
 								break;
 						}
 						break;
 					case State.MONEY :
+						switch(selected.tag){
+							case "gui" :
+								switch(selected.name){
+									case "ExitButton" :
+										mCurState = State.MAIN;
+										mCurCam.enabled = false;
+										mCurCam = Camera.main;
+										break;
+								}
+								break;
+						}
 						break;
 					case State.COUNT :
+						switch(selected.tag){
+							case "gui" :
+								switch(selected.name){
+									case "ExitButton" :
+										mCurState = State.MAIN;
+										mCurCam.enabled = false;
+										mCurCam = Camera.main;
+										break;
+								}
+								break;
+						}
 						break;
 					case State.STORE :
+						switch(selected.tag){
+							case "gui" :
+								switch(selected.name){
+									case "ExitButton" :
+										mCurState = State.MAIN;
+										mCurCam.enabled = false;
+										mCurCam = Camera.main;
+										break;
+								}
+								break;
+						}
 						break;
 				}
 			}
