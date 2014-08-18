@@ -656,6 +656,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 856310923}
+  - 61: {fileID: 856310924}
   m_Layer: 0
   m_Name: CountButton
   m_TagString: Untagged
@@ -677,6 +678,17 @@ Transform:
   - {fileID: 191654691}
   m_Father: {fileID: 0}
   m_RootOrder: 9
+--- !u!61 &856310924
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 856310922}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Size: {x: 74.3333435, y: 26.3333302}
+  m_Center: {x: 0, y: 0}
 --- !u!1 &973650128
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,6 +810,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1954290738}
+  - 61: {fileID: 1954290739}
   m_Layer: 0
   m_Name: MoneyButton
   m_TagString: Untagged
@@ -819,6 +832,17 @@ Transform:
   - {fileID: 355673100}
   m_Father: {fileID: 0}
   m_RootOrder: 8
+--- !u!61 &1954290739
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1954290737}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Size: {x: 74.3333435, y: 26.3333302}
+  m_Center: {x: 0, y: 0}
 --- !u!1 &2112775679
 GameObject:
   m_ObjectHideFlags: 0
