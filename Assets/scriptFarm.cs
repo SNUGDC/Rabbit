@@ -25,6 +25,7 @@ public class scriptFarm : MonoBehaviour {
 		mFieldArea = new Diamond(new Vector2(0, 9), 170, 87);
 		JsonGene.init();
 		Rabbit.init();
+		InvokeRepeating("decMoney", 10, 10);
 	}
 	void Update(){
 		// for inputs
@@ -152,6 +153,10 @@ public class scriptFarm : MonoBehaviour {
 				   											  + (Rabbit.rabbitList.Count * COST_MAINTENANCE).ToString() + "G)";
 		GameObject.Find("CountButton").transform.
 				   Find("Text").GetComponent<TextMesh>().text = Rabbit.rabbitList.Count.ToString() + "마리";
+	}
+
+	void decMoney(){
+		mMoney -= Rabbit.rabbitList.Count * COST_MAINTENANCE;
 	}
 
 // for field area test

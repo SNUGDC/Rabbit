@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Rabbit : MonoBehaviour {
+	public static readonly int LIFE_MAX = 2000;
+	public static readonly int LIFE_DECREASE = 1;
+
 	public static List<GameObject> rabbitList;
 	public static Sprite[ , ] headList = new Sprite[3, 5];
 	public static Sprite[ , ] bodyList = new Sprite[4, 5];
@@ -92,8 +95,17 @@ public class Rabbit : MonoBehaviour {
 			mIsAdult = value;
 		}
 	}
+	public int life{
+		get{
+			return mLife;
+		}
+		set{
+			mLife = value;
+		}
+	}
 	
 	private Sprite[] mSprite = new Sprite[5];
+	private int mLife = LIFE_MAX;
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
 
@@ -104,7 +116,9 @@ public class Rabbit : MonoBehaviour {
 		mSprite[3] = Resources.Load<Sprite>("Rabbits/teeh_none");
 		mSprite[4] = Resources.Load<Sprite>("Rabbits/leg_3");
 		Invoke("grow", 5);
+		InvokeRepeating("decLife", 0.01f, 0.01f);
 	}
+
 	void Update(){
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
@@ -130,5 +144,11 @@ public class Rabbit : MonoBehaviour {
 		transform.Find("Tail").renderer.material.color = mColor;
 		transform.Find("Teeth").renderer.material.color = mColor;
 		transform.Find("Leg").renderer.material.color = mColor;
+	}
+
+	void decLife(){
+		if(--mLife <= 0){
+			Rabbit.remove(this.gameObject);
+		}
 	}
 }
