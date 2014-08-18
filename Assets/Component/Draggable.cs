@@ -3,21 +3,19 @@ using System.Collections;
 
 public class Draggable : MonoBehaviour {
 
-	public bool noDrag{
+	public bool select{
 		get{
-			return mNoDrag;
+			return mSelect;
 		}
 		set{
-			mNoDrag = value;
+			mSelect = value;
 		}
 	}
 
-	private Selectable mSelectable;
-	private bool mNoDrag;
+	private bool mSelect;
 
 	// Use this for initialization
 	void Start () {
-		mSelectable = GetComponent<Selectable>();
 	}
 	
 	// Update is called once per frame
@@ -25,19 +23,8 @@ public class Draggable : MonoBehaviour {
 	}
 
 	void OnMouseDrag(){
-		bool selected = (mSelectable == null) ? true : mSelectable.selected;
-		if (selected && !mNoDrag) {
-			Vector2 temp = Input.mousePosition;
-			// limit draggable area
-			//if(scriptFarm.fieldArea.Contains(Camera.main.ScreenToWorldPoint(temp))){
-				transform.position = (Vector2)Camera.main.ScreenToWorldPoint(temp);
-			//}
-			/*
-			temp.x = Mathf.Max(temp.x, 0);
-			temp.x = Mathf.Min(temp.x, scriptFarm.sWidth * 0.9f);
-			temp.y = Mathf.Max(temp.y, 0);
-			temp.y = Mathf.Min(temp.y, scriptFarm.sHeight * 0.9f);
-			*/
+		if(mSelect){
+			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		}
 	}
 }
