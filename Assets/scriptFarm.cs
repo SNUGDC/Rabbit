@@ -29,6 +29,30 @@ public class scriptFarm : MonoBehaviour {
 				switch(mCurState){
 					case State.MAIN :
 						switch(mSelObj.tag){
+							case "Rabbit" :
+								mSelObj.GetComponent<Draggable>().select = true;
+								break;
+						}
+						break;
+					case State.MONEY :
+						break;
+					case State.COUNT :
+						break;
+					case State.STORE :
+						break;
+				}
+			}
+			else{
+				mSelObj = null;
+			}
+		}
+		if(Input.GetMouseButtonUp(0)){
+			Vector2 ray = mCurCam.ScreenToWorldPoint(Input.mousePosition);
+			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
+			if(hit.collider != null && mSelObj == hit.collider.gameObject){
+				switch(mCurState){
+					case State.MAIN :
+						switch(mSelObj.tag){
 							case "GUI" :
 								switch(mSelObj.name){
 									case "MoneyButton" :
@@ -52,6 +76,7 @@ public class scriptFarm : MonoBehaviour {
 								}
 								break;
 							case "Rabbit" :
+								mSelObj.GetComponent<Draggable>().select = false;
 								break;
 						}
 						break;
@@ -108,8 +133,8 @@ public class scriptFarm : MonoBehaviour {
 						break;
 				}
 			}
-			else{
-				mSelObj = null;
+			else if(mSelObj != null && mCurState == State.MAIN && mSelObj.tag == "Rabbit"){
+				mSelObj.GetComponent<Draggable>().select = false;
 			}
 		}
 		// updating texts
