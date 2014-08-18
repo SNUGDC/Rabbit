@@ -16,13 +16,11 @@ public class Draggable : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		mSelect = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	}
-
-	void OnMouseDrag(){
 		if(mSelect){
 			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		}
