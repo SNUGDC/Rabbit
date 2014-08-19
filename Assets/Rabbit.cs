@@ -7,6 +7,8 @@ public class Rabbit : MonoBehaviour {
 	public static readonly int LIFE_DECREASE = 1;
 
 	public static List<GameObject> rabbitList;
+	public static List<GameObject> dummyList;
+	public static List<GameObject> textList;
 	public static Sprite[ , ] headList = new Sprite[3, 5];
 	public static Sprite[ , ] bodyList = new Sprite[4, 5];
 	public static Sprite[] tailList = new Sprite[5];
@@ -15,6 +17,8 @@ public class Rabbit : MonoBehaviour {
 
 	public static void init(){
 		rabbitList = new List<GameObject>();
+		dummyList = new List<GameObject>();
+		textList = new List<GameObject>();
 		headList[0, 0] = Resources.Load<Sprite>("Rabbits/ear_none_1");
 		headList[0, 1] = Resources.Load<Sprite>("Rabbits/ear_none_2");
 		headList[0, 2] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -83,6 +87,35 @@ public class Rabbit : MonoBehaviour {
 	public static void remove(GameObject input){
 		rabbitList.Remove(input);
 		Destroy(input);
+	}
+
+	public static void createDummy(Rabbit original){
+		GameObject newDummy = (GameObject)Instantiate(scriptFarm.objDummy, new Vector2(700, 0), Quaternion.identity);
+		newDummy.transform.Find("Head").GetComponent<SpriteRenderer>().sprite = original.mSprite[0];
+		newDummy.transform.Find("Head").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Body").GetComponent<SpriteRenderer>().sprite = original.mSprite[1];
+		newDummy.transform.Find("Body").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = original.mSprite[2];
+		newDummy.transform.Find("Tail").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = original.mSprite[3];
+		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
+		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		GameObject newText = (GameObject)Instantiate(scriptFarm.objText, new Vector2(700, 0), Quaternion.identity);
+		newText.GetComponent<TextMesh>().text = "수명 : " + original.life.ToString() + " / " + Rabbit.LIFE_MAX.ToString();
+		dummyList.Add(newDummy);
+		textList.Add(newText);
+	}
+
+	public static void clearDummy(){
+		foreach(GameObject element in dummyList){
+			Destroy(element);
+		}
+		foreach(GameObject element in textList){
+			Destroy(element);
+		}
+		dummyList.Clear();
+		textList.Clear();
 	}
 
 	public Rabbit mFather = null;

@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class scriptFarm : MonoBehaviour {
-	public enum State{MAIN, MONEY, COUNT, STORE};
+	public enum State{MAIN, MONEY, MONEY_CONFIRM, COUNT, STORE};
 
 	private static readonly int MONEY_START = 10000;
+	private static readonly int COST_RABBIT = 200;
 	private static readonly int COST_MAINTENANCE = 200;
+	private static readonly int MENU_DISTANCE = 50;
+	private static readonly int TEXT_MARGIN = 50;
 
 	public static GameObject objRabbit;
+	public static GameObject objDummy;
+	public static GameObject objText;
 
 	private int mMoney;
 	private State mCurState;
@@ -18,6 +23,8 @@ public class scriptFarm : MonoBehaviour {
 
 	void Start(){
 		objRabbit = Resources.Load<GameObject>("prefabRabbit");
+		objDummy = Resources.Load<GameObject>("prefabDummy");
+		objText = Resources.Load<GameObject>("prefabText");
 		mMoney = MONEY_START;
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
@@ -50,7 +57,7 @@ public class scriptFarm : MonoBehaviour {
 						break;
 				}
 			}
-			else{
+			else if(mCurState != State.MONEY_CONFIRM && !(mSelObj != null && mCurState == State.MONEY && mSelObj.tag == "Dummy")){
 				mSelObj = null;
 			}
 		}
@@ -61,7 +68,7 @@ public class scriptFarm : MonoBehaviour {
 			if(mUpObj != null){
 				switch(mCurState){
 					case State.MAIN :
-						if(mSelObj.tag == "Rabbit"){
+						if(mSelObj != null && mSelObj.tag == "Rabbit"){
 							mSelObj.GetComponent<Draggable>().select = false;
 							if(!mFieldArea.Contains(mSelObj.transform.position)){
 								Rabbit.remove(mSelObj);
@@ -72,6 +79,14 @@ public class scriptFarm : MonoBehaviour {
 								switch(mUpObj.name){
 									case "MoneyButton" :
 										mCurState = State.MONEY;
+										foreach(GameObject element in Rabbit.rabbitList){
+											Rabbit.createDummy(element.GetComponent<Rabbit>());
+										}
+										for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+											Rabbit.dummyList[i].transform.position = new Vector2(520, 120 - i * MENU_DISTANCE );
+											Rabbit.textList[i].transform.position = new Vector2(520 + TEXT_MARGIN, 130 - i * MENU_DISTANCE);
+										}
+										Time.timeScale = 0;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(700, 0, -10);
 										mCurCam.enabled = true;
@@ -81,18 +96,24 @@ public class scriptFarm : MonoBehaviour {
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(1400, 0, -10);
 										mCurCam.enabled = true;
+										Time.timeScale = 0;
 										break;
 									case "StoreButton" :
 										mCurState = State.STORE;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(2100, 0, -10);
 										mCurCam.enabled = true;
+										Time.timeScale = 0;
 										break;
 								}
 								break;
 						}
 						break;
 					case State.MONEY :
+						if(mSelObj != null && mSelObj.tag == "Dummy" && mUpObj.tag == "Dummy"){
+							mCurState = State.MONEY_CONFIRM;
+							break;
+						}
 						switch(mUpObj.tag){
 							case "GUI" :
 								switch(mUpObj.name){
@@ -100,6 +121,8 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
+										Rabbit.clearDummy();
 										break;
 								}
 								break;
@@ -115,6 +138,8 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
+										Rabbit.clearDummy();
 										break;
 								}
 								break;
@@ -130,12 +155,15 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
 										break;
 									case "BuyIcon" :
 										Rabbit.create(null, null);
+										mMoney -= COST_RABBIT;
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
 										break;
 								}
 								break;
@@ -144,8 +172,10 @@ public class scriptFarm : MonoBehaviour {
 						}
 						break;
 				}
+				if(mCurState != State.MONEY_CONFIRM && !(mCurState == State.MONEY_CONFIRM && mUpObj.tag == "Dummy")){
+					mSelObj = null;
+				}
 			}
-			mSelObj = null;
 		}
 		// updating texts
 		GameObject.Find("MoneyButton").transform.
@@ -153,6 +183,30 @@ public class scriptFarm : MonoBehaviour {
 				   											  + (Rabbit.rabbitList.Count * COST_MAINTENANCE).ToString() + "G)";
 		GameObject.Find("CountButton").transform.
 				   Find("Text").GetComponent<TextMesh>().text = Rabbit.rabbitList.Count.ToString() + "마리";
+	}
+
+	void OnGUI(){
+		if(mCurState == State.MONEY_CONFIRM){
+			if(GUI.Button(new Rect(0, Screen.height * 0.5f, Screen.width * 0.1f, Screen.height * 0.1f), "SELL!!")){
+				mMoney += COST_RABBIT;
+				int index = Rabbit.dummyList.IndexOf(mSelObj);
+				Destroy(Rabbit.rabbitList[index]);
+				Destroy(Rabbit.dummyList[index]);
+				Destroy(Rabbit.textList[index]);
+				Rabbit.rabbitList.RemoveAt(index);
+				Rabbit.dummyList.RemoveAt(index);
+				Rabbit.textList.RemoveAt(index);
+				for(int i = index; i < Rabbit.dummyList.Count; ++i){
+					Vector2 cusPos = Rabbit.dummyList[i].transform.position;
+					Rabbit.dummyList[i].transform.position = new Vector2(cusPos.x, cusPos.y + MENU_DISTANCE);
+					Rabbit.textList[i].transform.position = new Vector2(cusPos.x + TEXT_MARGIN, cusPos.y + MENU_DISTANCE);
+				}
+				mCurState = State.MONEY;
+			}
+			if(GUI.Button(new Rect(0, Screen.height * 0.6f, Screen.width * 0.1f, Screen.height * 0.1f), "NOOO!!")){
+				mCurState = State.MONEY;
+			}
+		}
 	}
 
 	void decMoney(){
