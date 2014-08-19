@@ -17,6 +17,8 @@ public class Rabbit : MonoBehaviour {
 
 	public static void init(){
 		rabbitList = new List<GameObject>();
+		dummyList = new List<GameObject>();
+		textList = new List<GameObject>();
 		headList[0, 0] = Resources.Load<Sprite>("Rabbits/ear_none_1");
 		headList[0, 1] = Resources.Load<Sprite>("Rabbits/ear_none_2");
 		headList[0, 2] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -82,6 +84,11 @@ public class Rabbit : MonoBehaviour {
 		rabbitList.Add(newRabbit);
 	}
 
+	public static void remove(GameObject input){
+		rabbitList.Remove(input);
+		Destroy(input);
+	}
+
 	public static void createDummy(Rabbit original){
 		GameObject newDummy = (GameObject)Instantiate(scriptFarm.objDummy, new Vector2(700, 0), Quaternion.identity);
 		newDummy.transform.Find("Head").GetComponent<SpriteRenderer>().sprite = original.mSprite[0];
@@ -100,9 +107,15 @@ public class Rabbit : MonoBehaviour {
 		textList.Add(newText);
 	}
 
-	public static void remove(GameObject input){
-		rabbitList.Remove(input);
-		Destroy(input);
+	public static void clearDummy(){
+		foreach(GameObject element in dummyList){
+			Destroy(element);
+		}
+		foreach(GameObject element in textList){
+			Destroy(element);
+		}
+		dummyList.Clear();
+		textList.Clear();
 	}
 
 	public Rabbit mFather = null;

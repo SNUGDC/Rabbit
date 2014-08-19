@@ -7,6 +7,8 @@ public class scriptFarm : MonoBehaviour {
 
 	private static readonly int MONEY_START = 10000;
 	private static readonly int COST_MAINTENANCE = 200;
+	private static readonly int MENU_DISTANCE = 50;
+	private static readonly int TEXT_MARGIN = 50;
 
 	public static GameObject objRabbit;
 	public static GameObject objDummy;
@@ -76,6 +78,14 @@ public class scriptFarm : MonoBehaviour {
 								switch(mUpObj.name){
 									case "MoneyButton" :
 										mCurState = State.MONEY;
+										foreach(GameObject element in Rabbit.rabbitList){
+											Rabbit.createDummy(element.GetComponent<Rabbit>());
+										}
+										for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+											Rabbit.dummyList[i].transform.position = new Vector2(520, 120 - i * MENU_DISTANCE );
+											Rabbit.textList[i].transform.position = new Vector2(520 + TEXT_MARGIN, 130 - i * MENU_DISTANCE);
+										}
+										Time.timeScale = 0;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(700, 0, -10);
 										mCurCam.enabled = true;
@@ -85,12 +95,14 @@ public class scriptFarm : MonoBehaviour {
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(1400, 0, -10);
 										mCurCam.enabled = true;
+										Time.timeScale = 0;
 										break;
 									case "StoreButton" :
 										mCurState = State.STORE;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(2100, 0, -10);
 										mCurCam.enabled = true;
+										Time.timeScale = 0;
 										break;
 								}
 								break;
@@ -104,6 +116,8 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
+										Rabbit.clearDummy();
 										break;
 								}
 								break;
@@ -119,6 +133,8 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
+										Rabbit.clearDummy();
 										break;
 								}
 								break;
@@ -134,12 +150,14 @@ public class scriptFarm : MonoBehaviour {
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
 										break;
 									case "BuyIcon" :
 										Rabbit.create(null, null);
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
+										Time.timeScale = 1;
 										break;
 								}
 								break;
