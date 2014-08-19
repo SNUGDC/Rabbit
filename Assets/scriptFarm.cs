@@ -92,6 +92,14 @@ public class scriptFarm : MonoBehaviour {
 										mCurCam.enabled = true;
 										break;
 									case "CountButton" :
+										mCurState = State.MONEY;
+										foreach(GameObject element in Rabbit.rabbitList){
+											Rabbit.createDummy(element.GetComponent<Rabbit>());
+										}
+										for(int i = 0; i < Rabbit.dummyList.Count; ++i){
+											Rabbit.dummyList[i].transform.position = new Vector2(1220, 120 - i * MENU_DISTANCE );
+											Rabbit.textList[i].transform.position = new Vector2(1220 + TEXT_MARGIN, 130 - i * MENU_DISTANCE);
+										}
 										mCurState = State.COUNT;
 										mCurCam = GameObject.Find("List Camera").GetComponent<Camera>();
 										mCurCam.gameObject.transform.position = new Vector3(1400, 0, -10);
@@ -144,6 +152,16 @@ public class scriptFarm : MonoBehaviour {
 								}
 								break;
 							case "Dummy" :
+								mCurState = State.MAIN;
+								GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = true;
+								Vector3 newPos = Rabbit.rabbitList[Rabbit.dummyList.IndexOf(mUpObj)].transform.position;
+								newPos.z = 0.2f;
+								GameObject.Find("Light").transform.position = newPos;
+								Invoke("disableLight", 3);
+								mCurCam.enabled = false;
+								mCurCam = Camera.main;
+								Time.timeScale = 1;
+								Rabbit.clearDummy();
 								break;
 						}
 						break;
@@ -166,8 +184,6 @@ public class scriptFarm : MonoBehaviour {
 										Time.timeScale = 1;
 										break;
 								}
-								break;
-							case "Dummy" :
 								break;
 						}
 						break;
@@ -211,6 +227,10 @@ public class scriptFarm : MonoBehaviour {
 
 	void decMoney(){
 		mMoney -= Rabbit.rabbitList.Count * COST_MAINTENANCE;
+	}
+
+	void disableLight(){
+		GameObject.Find("Light").GetComponent<SpriteRenderer>().enabled = false;
 	}
 
 // for field area test
