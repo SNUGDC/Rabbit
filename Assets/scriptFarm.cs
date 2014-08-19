@@ -14,6 +14,7 @@ public class scriptFarm : MonoBehaviour {
 	public static GameObject objRabbit;
 	public static GameObject objDummy;
 	public static GameObject objText;
+	public static List<GameObject> roomList;
 
 	private int mMoney;
 	private State mCurState;
@@ -25,6 +26,7 @@ public class scriptFarm : MonoBehaviour {
 		objRabbit = Resources.Load<GameObject>("prefabRabbit");
 		objDummy = Resources.Load<GameObject>("prefabDummy");
 		objText = Resources.Load<GameObject>("prefabText");
+		roomList = new List<GameObject>();
 		mMoney = MONEY_START;
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
@@ -70,7 +72,24 @@ public class scriptFarm : MonoBehaviour {
 					case State.MAIN :
 						if(mSelObj != null && mSelObj.tag == "Rabbit"){
 							mSelObj.GetComponent<Draggable>().select = false;
-							if(!mFieldArea.Contains(mSelObj.transform.position)){
+							bool isHouse = false;
+							RaycastHit2D[] hitArr = Physics2D.RaycastAll(ray, Vector2.zero);
+							foreach(RaycastHit2D element in hitArr){
+								if(element.collider.gameObject.name == "House"){
+									isHouse = true;
+									break;
+								}
+							}
+							if(isHouse){
+								if(roomList.Count < 2){
+									roomList.Add(mSelObj);
+									mSelObj.transform.position = new Vector2(0, 1000);
+								}
+								else{
+									mSelObj.transform.position = new Vector2(0, 0);
+								}
+							}
+							else if(!mFieldArea.Contains(mSelObj.transform.position)){
 								Rabbit.remove(mSelObj);
 							}
 						}
@@ -221,6 +240,22 @@ public class scriptFarm : MonoBehaviour {
 			}
 			if(GUI.Button(new Rect(0, Screen.height * 0.6f, Screen.width * 0.1f, Screen.height * 0.1f), "NOOO!!")){
 				mCurState = State.MONEY;
+			}
+		}
+		if(roomList.Count >= 2){
+			if(GUI.Button(new Rect(Screen.width * 0.9f, Screen.height * 0.6f, Screen.width * 0.1f, Screen.height * 0.1f), "!WOW!")){
+				foreach(GameObject element in roomList){
+					element.transform.position = new Vector2(0, 0);
+				}
+				if(roomList[0].GetComponent<Rabbit>().gender != roomList[1].GetComponent<Rabbit>().gender){
+					if(roomList[0].GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
+						Rabbit.create(roomList[0], roomList[1]);
+					}
+					else{
+						Rabbit.create(roomList[1], roomList[0]);
+					}
+				}
+				roomList.Clear();
 			}
 		}
 	}

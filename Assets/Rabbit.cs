@@ -6,6 +6,8 @@ public class Rabbit : MonoBehaviour {
 	public static readonly int LIFE_MAX = 2000;
 	public static readonly int LIFE_DECREASE = 1;
 
+	public enum Gender{MALE, FEMALE};
+
 	public static List<GameObject> rabbitList;
 	public static List<GameObject> dummyList;
 	public static List<GameObject> textList;
@@ -136,11 +138,20 @@ public class Rabbit : MonoBehaviour {
 			mLife = value;
 		}
 	}
+	public Gender gender{
+		get{
+			return mGender;
+		}
+		set{
+			mGender = value;
+		}
+	}
 	
 	private Sprite[] mSprite = new Sprite[5];
 	private int mLife = LIFE_MAX;
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
+	private Gender mGender;
 
 	void Start(){
 		mSprite[0] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -148,6 +159,7 @@ public class Rabbit : MonoBehaviour {
 		mSprite[2] = Resources.Load<Sprite>("Rabbits/tail_3");
 		mSprite[3] = Resources.Load<Sprite>("Rabbits/teeh_none");
 		mSprite[4] = Resources.Load<Sprite>("Rabbits/leg_3");
+		mGender = ((int)(Random.Range(0, 2)) == 0) ? Gender.MALE : Gender.FEMALE;
 		Invoke("grow", 5);
 		InvokeRepeating("decLife", 0.01f, 0.01f);
 	}
