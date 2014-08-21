@@ -147,7 +147,7 @@ public class Rabbit : MonoBehaviour {
 	void Update(){
 		//Vector2 tempPos;
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
-		transform.Find("Head").transform.position.z = transform.Find("Head").transform.position.y / 100 - 0.001f;
+		//transform.Find("Head").transform.position.z = transform.Find("Head").transform.position.y / 100 - 0.001f;
 		//tempPos.z = tempPos.y / 100 - 0.001f;
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];

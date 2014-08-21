@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 public class scriptFarm : MonoBehaviour {
-	public enum State{MAIN, MONEY, MONEY_CONFIRM, COUNT, STORE};
+	public enum State{SISTER, MAIN, MONEY, MONEY_CONFIRM, COUNT, STORE};
 
 	private static readonly int MONEY_START = 10000;
 	private static readonly int COST_RABBIT = 200;
@@ -32,8 +32,20 @@ public class scriptFarm : MonoBehaviour {
 		mCurState = State.MAIN;
 		// make field area from experience
 		mFieldArea = new Diamond(new Vector2(0, -11), 215, 108);
-		JsonGene.init();
 		Rabbit.init();
+		string targetText = "";
+		for(int i = 0; i < scriptLevelSelect.geneList.Count; ++i){
+			targetText += scriptLevelSelect.geneList[i].name + " : ";
+			for(int j = 0; j < scriptLevelSelect.geneList[i].factor.GetLength(0); ++j){
+				for(int k = 0; k < scriptLevelSelect.geneList[i].factor.GetLength(1); ++k){
+					targetText += scriptLevelSelect.geneList[i].factor[j, k];
+				}
+				targetText += ", ";
+			}
+			targetText = targetText.Remove(targetText.Length - 2, 2);
+			targetText += "\n";
+		}
+		GameObject.Find("TargetText").GetComponent<TextMesh>().text = targetText;
 		InvokeRepeating("decMoney", 10, 10);
 	}
 	void Update(){
@@ -69,6 +81,19 @@ public class scriptFarm : MonoBehaviour {
 			GameObject mUpObj = (hit.collider == null) ? null : hit.collider.gameObject;
 			if(mUpObj != null){
 				switch(mCurState){
+					case State.SISTER :
+						if(mUpObj.tag == "Sister"){
+							GameObject.Find("Sister").transform.position = new Vector2(-10, -32);
+							GameObject.Find("Sister").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("sister_normal_down");
+							GameObject.Find("Sister").GetComponent<BoxCollider2D>().center = new Vector2(-102, -90);
+							GameObject.Find("Sister").GetComponent<BoxCollider2D>().size = new Vector2(70, 80);
+							GameObject.Find("MessageBox").GetComponent<SpriteRenderer>().enabled = false;
+							GameObject.Find("MessageBox").transform.Find("Text").GetComponent<MeshRenderer>().enabled = false;
+							GameObject.Find("MessageBackground").GetComponent<SpriteRenderer>().enabled = false;
+							mCurState = State.MAIN;
+							Time.timeScale = 1;
+						}
+						break;
 					case State.MAIN :
 						if(mSelObj != null && mSelObj.tag == "Rabbit"){
 							mSelObj.GetComponent<Draggable>().select = false;
@@ -94,6 +119,17 @@ public class scriptFarm : MonoBehaviour {
 							}
 						}
 						switch(mUpObj.tag){
+							case "Sister" :
+								mCurState = State.SISTER;
+								GameObject.Find("Sister").transform.position = new Vector2(-110, -20);
+								GameObject.Find("Sister").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("sister_dot_up");
+								GameObject.Find("Sister").GetComponent<BoxCollider2D>().center = new Vector2(0, 0);
+								GameObject.Find("Sister").GetComponent<BoxCollider2D>().size = new Vector2(180.75f, 298.75f);
+								GameObject.Find("MessageBox").GetComponent<SpriteRenderer>().enabled = true;
+								GameObject.Find("MessageBox").transform.Find("Text").GetComponent<MeshRenderer>().enabled = true;
+								GameObject.Find("MessageBackground").GetComponent<SpriteRenderer>().enabled = true;
+								Time.timeScale = 0;
+								break;
 							case "GUI" :
 								switch(mUpObj.name){
 									case "MoneyButton" :
@@ -196,6 +232,9 @@ public class scriptFarm : MonoBehaviour {
 										break;
 									case "BuyIcon" :
 										Rabbit.create(null, null);
+										if(Gene.phenoEqual(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1].GetComponent<Gene>(), scriptLevelSelect.geneList)){
+											Application.LoadLevel("sceneLevelSelect");
+										}
 										mMoney -= COST_RABBIT;
 										mCurState = State.MAIN;
 										mCurCam.enabled = false;
@@ -248,6 +287,9 @@ public class scriptFarm : MonoBehaviour {
 					element.transform.position = new Vector2(0, 0);
 				}
 				Rabbit.create(roomList[1], roomList[0]);
+				if(Gene.phenoEqual(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1].GetComponent<Gene>(), scriptLevelSelect.geneList)){
+					Application.LoadLevel("sceneLevelSelect");
+				}
 				roomList.Clear();
 			}
 		}

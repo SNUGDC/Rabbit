@@ -48,12 +48,8 @@ public class Gene : MonoBehaviour {
 
 	private List<GeneNode> mList = new List<GeneNode>();
 
-	void Start(){
-	}
-
-	void Update(){
-
-	}
+	void Start(){}
+	void Update(){}
 
 	public void create(Gene father, Gene mother){
 		if(father == null || mother == null){
@@ -128,5 +124,58 @@ public class Gene : MonoBehaviour {
 				mList.Add(newNode);
 			}
 		}
+	}
+
+	public void setField(string field, int number, string first, string second){
+		GeneNode target = new GeneNode();
+		foreach(GeneNode element in mList){
+			if(element.name == field){
+				target = element;
+				break;
+			}
+		}
+		if(target.name != field){
+			return;
+		}
+		int[] firstIndex = new int[2];
+		int[] secondIndex = new int[2];
+		firstIndex[0] = secondIndex[0] = -1;
+		for(int i = 0; i < target.originalGene.factorList.Length; ++i){
+			for(int j = 0; j < target.originalGene.factorList[i].Length; ++j){
+				if(target.originalGene.factorList[i][j] == first){
+					firstIndex[0] = i;
+					firstIndex[1] = j;
+				}
+				if(target.originalGene.factorList[i][j] == second){
+					secondIndex[0] = i;
+					secondIndex[1] = j;
+				}
+			}
+		}
+		if(firstIndex[0] != -1 && secondIndex[0] != -1){
+			target.factor[number, 0] = first;
+			target.factor[number, 1] = second;
+			target.factorIndex[number, 0, 0] = firstIndex[0];
+			target.factorIndex[number, 0, 1] = firstIndex[1];
+			target.factorIndex[number, 1, 0] = secondIndex[0];
+			target.factorIndex[number, 1, 1] = secondIndex[1];
+		}
+	}
+
+	public static bool phenoEqual(Gene input, List<GeneNode> target){
+		bool result = true;
+		result &= input.mList[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;})
+			   == target[1].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		/*
+		result &= input.mList[2].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;})
+			   == target[2].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		result &= input.mList[6].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1;})
+			   == target[6].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1;});
+		result &= input.mList[3].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;})
+			   == target[3].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		result &= input.mList[5].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;})
+			   == target[5].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
+		*/
+		return result;
 	}
 }
