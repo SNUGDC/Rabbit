@@ -103,7 +103,7 @@ public class Gene : MonoBehaviour {
 				// inherit operation - get one factor from father, another factor from mother
 				for(int j = 0; j < JsonGene.list[i].numDominant; ++j){
 					// get first factor from father
-					if(Random.Range(0, 2) == 0){
+					if((int)(Random.Range(0, 2)) == 0){
 						int randIndex = Random.Range(0, 2);
 						newNode.factor[j, 0] = father.mList[i].factor[j, randIndex];
 						newNode.factorIndex[j, 0, 0] = father.mList[i].factorIndex[j, randIndex, 0];

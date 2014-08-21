@@ -3,9 +3,9 @@
 --- !u!78 &1
 TagManager:
   tags:
-  - rabbit
-  - dummy
-  - house
+  - Rabbit
+  - Dummy
+  - GUI
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX
