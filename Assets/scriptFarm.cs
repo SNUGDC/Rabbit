@@ -31,7 +31,7 @@ public class scriptFarm : MonoBehaviour {
 		mCurCam = Camera.main;
 		mCurState = State.MAIN;
 		// make field area from experience
-		mFieldArea = new Diamond(new Vector2(0, 9), 170, 87);
+		mFieldArea = new Diamond(new Vector2(0, -11), 215, 108);
 		JsonGene.init();
 		Rabbit.init();
 		InvokeRepeating("decMoney", 10, 10);
@@ -247,14 +247,7 @@ public class scriptFarm : MonoBehaviour {
 				foreach(GameObject element in roomList){
 					element.transform.position = new Vector2(0, 0);
 				}
-				if(roomList[0].GetComponent<Rabbit>().gender != roomList[1].GetComponent<Rabbit>().gender){
-					if(roomList[0].GetComponent<Rabbit>().gender == Rabbit.Gender.MALE){
-						Rabbit.create(roomList[0], roomList[1]);
-					}
-					else{
-						Rabbit.create(roomList[1], roomList[0]);
-					}
-				}
+				Rabbit.create(roomList[1], roomList[0]);
 				roomList.Clear();
 			}
 		}

@@ -6,8 +6,6 @@ public class Rabbit : MonoBehaviour {
 	public static readonly int LIFE_MAX = 2000;
 	public static readonly int LIFE_DECREASE = 1;
 
-	public enum Gender{MALE, FEMALE};
-
 	public static List<GameObject> rabbitList;
 	public static List<GameObject> dummyList;
 	public static List<GameObject> textList;
@@ -76,12 +74,6 @@ public class Rabbit : MonoBehaviour {
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
 		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
-		try{
-			newRabbit.GetComponent<Rabbit>().mFather = father.GetComponent<Rabbit>();
-		}catch{}
-		try{
-			newRabbit.GetComponent<Rabbit>().mMother = mother.GetComponent<Rabbit>();
-		}catch{}
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit);
 	}
@@ -120,8 +112,6 @@ public class Rabbit : MonoBehaviour {
 		textList.Clear();
 	}
 
-	public Rabbit mFather = null;
-	public Rabbit mMother = null;
 	public bool isAdult{
 		get{
 			return mIsAdult;
@@ -138,20 +128,11 @@ public class Rabbit : MonoBehaviour {
 			mLife = value;
 		}
 	}
-	public Gender gender{
-		get{
-			return mGender;
-		}
-		set{
-			mGender = value;
-		}
-	}
 	
 	private Sprite[] mSprite = new Sprite[5];
 	private int mLife = LIFE_MAX;
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
-	private Gender mGender;
 
 	void Start(){
 		mSprite[0] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -159,16 +140,22 @@ public class Rabbit : MonoBehaviour {
 		mSprite[2] = Resources.Load<Sprite>("Rabbits/tail_3");
 		mSprite[3] = Resources.Load<Sprite>("Rabbits/teeh_none");
 		mSprite[4] = Resources.Load<Sprite>("Rabbits/leg_3");
-		mGender = ((int)(Random.Range(0, 2)) == 0) ? Gender.MALE : Gender.FEMALE;
 		Invoke("grow", 5);
 		InvokeRepeating("decLife", 0.01f, 0.01f);
 	}
 
 	void Update(){
+		//Vector2 tempPos;
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
+		transform.Find("Head").transform.position.z = transform.Find("Head").transform.position.y / 100 - 0.001f;
+		//tempPos.z = tempPos.y / 100 - 0.001f;
+		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
+		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
 		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
+		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
+		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 	}
 
@@ -187,7 +174,6 @@ public class Rabbit : MonoBehaviour {
 		transform.Find("Head").renderer.material.color = mColor;
 		transform.Find("Body").renderer.material.color = mColor;
 		transform.Find("Tail").renderer.material.color = mColor;
-		transform.Find("Teeth").renderer.material.color = mColor;
 		transform.Find("Leg").renderer.material.color = mColor;
 	}
 
