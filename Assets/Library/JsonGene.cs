@@ -140,6 +140,9 @@ public struct JsonGene{
 									case "Jade" : 
 										arArElement[i] = new Color(0.61f, 0.83f, 0.76f);
 										break;
+									case "Red" :
+										arArElement[i] = new Color(1.0f, 0.0f, 0.0f);
+										break;
 									default :
 										arArElement[i] = new Color(1.0f, 1.0f, 1.0f);
 										break;
@@ -174,6 +177,9 @@ public struct JsonGene{
 										break;
 									case "1" :
 										arArElement[i] = 1;
+										break;
+									case "2" :
+										arArElement[i] = 2;
 										break;
 								}
 							}

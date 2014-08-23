@@ -103,16 +103,13 @@
 {
 	"name" : "length",
 	"factorList" : [
-					["X"],
-					["x"]
+					["X", "x"]
 				   ],
-	"numDominant" : 4,
+	"numDominant" : 2,
 	"factorHashTable" : [
 							[
-								[1]
-							],
-							[
-								[0]
+								[2, 1],
+								[1, 0]
 							]
 						]
 }

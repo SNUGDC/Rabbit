@@ -69,7 +69,7 @@ public class Rabbit : MonoBehaviour {
 	}
 
 	public static void create(GameObject father, GameObject mother){
-		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, Vector2.zero, Quaternion.identity);
+		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, new Vector2(Random.Range(-100, 100), Random.Range(-50, 50)), Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
 		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
@@ -95,6 +95,8 @@ public class Rabbit : MonoBehaviour {
 		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
 		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
 		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Eye").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Rabbits/ear");
+		newDummy.transform.Find("Eye").renderer.material.color = original.mEyeColor;
 		GameObject newText = (GameObject)Instantiate(scriptFarm.objText, new Vector2(700, 0), Quaternion.identity);
 		newText.GetComponent<TextMesh>().text = "수명 : " + original.life.ToString() + " / " + Rabbit.LIFE_MAX.ToString();
 		dummyList.Add(newDummy);
@@ -133,6 +135,7 @@ public class Rabbit : MonoBehaviour {
 	private int mLife = LIFE_MAX;
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
+	private Color mEyeColor = new Color(1, 1, 1);
 
 	void Start(){
 		mSprite[0] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -140,23 +143,12 @@ public class Rabbit : MonoBehaviour {
 		mSprite[2] = Resources.Load<Sprite>("Rabbits/tail_3");
 		mSprite[3] = Resources.Load<Sprite>("Rabbits/teeh_none");
 		mSprite[4] = Resources.Load<Sprite>("Rabbits/leg_3");
-		Invoke("grow", 5);
+		Invoke("grow", 2);
 		InvokeRepeating("decLife", 0.01f, 0.01f);
 	}
 
 	void Update(){
-		//Vector2 tempPos;
-		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
-		transform.Find("Head").transform.position.z = transform.Find("Head").transform.position.y / 100 - 0.001f;
-		//tempPos.z = tempPos.y / 100 - 0.001f;
-		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
-		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
-		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
-		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
-		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
-		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
-		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
-		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
+		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y / 100);
 	}
 
 	void grow(){
@@ -172,14 +164,23 @@ public class Rabbit : MonoBehaviour {
 		mSprite[3] = teethList[teethIndex];
 		mSprite[4] = legList[lengthIndex];
 		transform.Find("Head").renderer.material.color = mColor;
+		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Body").renderer.material.color = mColor;
+		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
 		transform.Find("Tail").renderer.material.color = mColor;
+		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
 		transform.Find("Leg").renderer.material.color = mColor;
+		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
+		mEyeColor = GetComponent<Gene>().list[4].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		transform.Find("Eye").renderer.material.color = mEyeColor;
 	}
 
 	void decLife(){
 		if(--mLife <= 0){
 			Rabbit.remove(this.gameObject);
+			if(Gene.phenoEqual(this.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
+				--(Camera.main.gameObject.GetComponent<scriptFarm>().mWinCount);
+			}
 		}
 	}
 }
