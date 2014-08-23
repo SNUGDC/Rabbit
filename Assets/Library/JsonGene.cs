@@ -178,6 +178,9 @@ public struct JsonGene{
 									case "1" :
 										arArElement[i] = 1;
 										break;
+									case "2" :
+										arArElement[i] = 2;
+										break;
 								}
 							}
 						}

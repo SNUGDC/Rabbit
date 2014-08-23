@@ -164,9 +164,13 @@ public class Rabbit : MonoBehaviour {
 		mSprite[3] = teethList[teethIndex];
 		mSprite[4] = legList[lengthIndex];
 		transform.Find("Head").renderer.material.color = mColor;
+		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Body").renderer.material.color = mColor;
+		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
 		transform.Find("Tail").renderer.material.color = mColor;
+		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
 		transform.Find("Leg").renderer.material.color = mColor;
+		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		mEyeColor = GetComponent<Gene>().list[4].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
 		transform.Find("Eye").renderer.material.color = mEyeColor;
 	}
