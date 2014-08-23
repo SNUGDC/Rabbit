@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class scriptFarm : MonoBehaviour {
-	public enum State{SISTER, MAIN, MONEY, MONEY_CONFIRM, COUNT, STORE};
+	public enum State{START, SISTER, MAIN, MONEY, MONEY_CONFIRM, COUNT, STORE, WIN};
 
 	private static readonly int MONEY_START = 10000;
 	private static readonly int COST_RABBIT = 200;
@@ -16,6 +16,8 @@ public class scriptFarm : MonoBehaviour {
 	public static GameObject objText;
 	public static List<GameObject> roomList;
 
+	public int mWinCount;
+	private int mScriptIndex;
 	private int mMoney;
 	private State mCurState;
 	private Camera mCurCam;
@@ -23,29 +25,24 @@ public class scriptFarm : MonoBehaviour {
 	private Diamond mFieldArea;
 
 	void Start(){
+		mWinCount = 0;
+		mScriptIndex = 0;
 		objRabbit = Resources.Load<GameObject>("prefabRabbit");
 		objDummy = Resources.Load<GameObject>("prefabDummy");
 		objText = Resources.Load<GameObject>("prefabText");
 		roomList = new List<GameObject>();
 		mMoney = MONEY_START;
 		mCurCam = Camera.main;
-		mCurState = State.MAIN;
+		mCurState = State.START;
 		// make field area from experience
 		mFieldArea = new Diamond(new Vector2(0, -11), 215, 108);
 		Rabbit.init();
 		string targetText = "";
-		for(int i = 0; i < scriptLevelSelect.geneList.Count; ++i){
-			targetText += scriptLevelSelect.geneList[i].name + " : ";
-			for(int j = 0; j < scriptLevelSelect.geneList[i].factor.GetLength(0); ++j){
-				for(int k = 0; k < scriptLevelSelect.geneList[i].factor.GetLength(1); ++k){
-					targetText += scriptLevelSelect.geneList[i].factor[j, k];
-				}
-				targetText += ", ";
-			}
-			targetText = targetText.Remove(targetText.Length - 2, 2);
-			targetText += "\n";
+		for(int i = 0; i < scriptLevelSelect.levelList[scriptLevelSelect.level - 1].targetText.Length; ++i){
+			targetText += scriptLevelSelect.levelList[scriptLevelSelect.level - 1].targetText[i] + "\n";
 		}
 		GameObject.Find("TargetText").GetComponent<TextMesh>().text = targetText;
+		GameObject.Find("MessageBox").transform.Find("Text").GetComponent<TextMesh>().text = scriptLevelSelect.levelList[scriptLevelSelect.level - 1].script[mScriptIndex];
 		InvokeRepeating("decMoney", 10, 10);
 	}
 	void Update(){
@@ -81,6 +78,24 @@ public class scriptFarm : MonoBehaviour {
 			GameObject mUpObj = (hit.collider == null) ? null : hit.collider.gameObject;
 			if(mUpObj != null){
 				switch(mCurState){
+					case State.START :
+						if(mUpObj.tag == "Sister"){
+							if(++mScriptIndex >= scriptLevelSelect.levelList[scriptLevelSelect.level - 1].script.Length){
+								GameObject.Find("Sister").transform.position = new Vector2(-10, -32);
+								GameObject.Find("Sister").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("sister_normal_down");
+								GameObject.Find("Sister").GetComponent<BoxCollider2D>().center = new Vector2(-102, -90);
+								GameObject.Find("Sister").GetComponent<BoxCollider2D>().size = new Vector2(70, 80);
+								GameObject.Find("MessageBox").GetComponent<SpriteRenderer>().enabled = false;
+								GameObject.Find("MessageBox").transform.Find("Text").GetComponent<MeshRenderer>().enabled = false;
+								GameObject.Find("MessageBackground").GetComponent<SpriteRenderer>().enabled = false;
+								GameObject.Find("MessageBox").transform.Find("Text").GetComponent<TextMesh>().text = "!!!!!";
+								mCurState = State.MAIN;
+							}
+							else{
+								GameObject.Find("MessageBox").transform.Find("Text").GetComponent<TextMesh>().text = scriptLevelSelect.levelList[scriptLevelSelect.level - 1].script[mScriptIndex];
+							}
+						}
+							break;
 					case State.SISTER :
 						if(mUpObj.tag == "Sister"){
 							GameObject.Find("Sister").transform.position = new Vector2(-10, -32);
@@ -232,11 +247,10 @@ public class scriptFarm : MonoBehaviour {
 										break;
 									case "BuyIcon" :
 										Rabbit.create(null, null);
-										if(Gene.phenoEqual(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1].GetComponent<Gene>(), scriptLevelSelect.geneList)){
-											Application.LoadLevel("sceneLevelSelect");
+										if(!checkCondition(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1])){
+											mCurState = State.MAIN;
 										}
 										mMoney -= COST_RABBIT;
-										mCurState = State.MAIN;
 										mCurCam.enabled = false;
 										mCurCam = Camera.main;
 										Time.timeScale = 1;
@@ -281,18 +295,33 @@ public class scriptFarm : MonoBehaviour {
 				mCurState = State.MONEY;
 			}
 		}
+		else if(mCurState == State.WIN){
+			if(GUI.Button(new Rect(Screen.width * 0.15f, Screen.height * 0.15f, Screen.width * 0.7f, Screen.height * 0.7f), "WIN!!")){	
+				Application.LoadLevel("sceneLevelSelect");
+			}
+		}
 		if(roomList.Count >= 2){
 			if(GUI.Button(new Rect(Screen.width * 0.9f, Screen.height * 0.6f, Screen.width * 0.1f, Screen.height * 0.1f), "!WOW!")){
 				foreach(GameObject element in roomList){
 					element.transform.position = new Vector2(0, 0);
 				}
 				Rabbit.create(roomList[1], roomList[0]);
-				if(Gene.phenoEqual(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1].GetComponent<Gene>(), scriptLevelSelect.geneList)){
-					Application.LoadLevel("sceneLevelSelect");
-				}
+				checkCondition(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1]);
 				roomList.Clear();
 			}
 		}
+	}
+
+	public bool checkCondition(GameObject input){
+		if(Gene.phenoEqual(input.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
+			++mWinCount;
+		}
+		if(mWinCount >= scriptLevelSelect.levelList[scriptLevelSelect.level - 1].count){
+			mCurState = State.WIN;
+			GameObject.Find("TargetText").GetComponent<TextMesh>().text = "WIN!!!";
+			return true;
+		}
+		return false;
 	}
 
 	void decMoney(){

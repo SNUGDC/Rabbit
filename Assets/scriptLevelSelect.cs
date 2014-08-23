@@ -1,37 +1,62 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
 public class scriptLevelSelect : MonoBehaviour {
 
+	public struct LevelData{
+		public string[] script;
+		public bool[] condition;
+		public int count;
+		public string[][] target;
+		public string[] targetText;
+	}
+
+	public static int level;
 	public static List<GeneNode> geneList;
+	public static List<LevelData> levelList;
+
 	private static int mSWidth = Screen.width;
 	private static int mSHeight = Screen.height;
 
 	// Use this for initialization
 	void Start(){
 		JsonGene.init();
+		levelList = new List<LevelData>();
+		System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("LevelData").text);
+		string read = null, json = null;
+		// read each JsonGene from GeneFile
+		while(inFile.Peek() >= 0){
+			inFile.ReadLine();
+			do{
+				read = inFile.ReadLine();
+				json += read + "\n";
+			}while(read != "}");
+			levelList.Add(JsonMapper.ToObject<scriptLevelSelect.LevelData>(json));
+			json = null;
+		}
+		inFile.Close ();
 	}
 	
 	// Update is called once per frame
-	void Update(){
-	
-	}
+	void Update(){}
 
 	void OnGUI(){
 		if(GUI.Button (new Rect (mSWidth * 0.075f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "1")) {
+			level = 1;
 			GameObject targetRabbit = (GameObject)Instantiate(Resources.Load<GameObject>("prefabRabbit"), new Vector2(-700, 0), Quaternion.identity);
 			targetRabbit.GetComponent<Rabbit>().enabled = false;
 			targetRabbit.GetComponent<Draggable>().enabled = false;
 			targetRabbit.GetComponent<Gene>().create(null, null);
-			targetRabbit.GetComponent<Gene>().setField("color", 0, "R", "B");
-			targetRabbit.GetComponent<Gene>().setField("pattern", 0, "♠", "♠");
-			targetRabbit.GetComponent<Gene>().setField("ear", 0, "X", "x");
-			targetRabbit.GetComponent<Gene>().setField("teeth", 0, "X", "x");
-			targetRabbit.GetComponent<Gene>().setField("length", 0, "x", "x");
-			targetRabbit.GetComponent<Gene>().setField("length", 1, "X", "x");
-			targetRabbit.GetComponent<Gene>().setField("length", 2, "X", "x");
-			targetRabbit.GetComponent<Gene>().setField("length", 3, "X", "x");
+			for(int i = 0; i < levelList[level - 1].target[0].Length; ++i){
+				for(int j = 0; j < levelList[level - 1].target[i + 1].Length; j += 2){
+					targetRabbit.GetComponent<Gene>().setField(levelList[level - 1].target[0][i],
+															   j / 2,
+															   levelList[level - 1].target[i + 1][j],
+															   levelList[level - 1].target[i + 1][j + 1]);
+				}
+			}
 			geneList = targetRabbit.GetComponent<Gene>().list;
 			Application.LoadLevel("sceneFarm");
 		}

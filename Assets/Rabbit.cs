@@ -140,7 +140,7 @@ public class Rabbit : MonoBehaviour {
 		mSprite[2] = Resources.Load<Sprite>("Rabbits/tail_3");
 		mSprite[3] = Resources.Load<Sprite>("Rabbits/teeh_none");
 		mSprite[4] = Resources.Load<Sprite>("Rabbits/leg_3");
-		Invoke("grow", 5);
+		Invoke("grow", 2);
 		InvokeRepeating("decLife", 0.01f, 0.01f);
 	}
 
@@ -180,6 +180,9 @@ public class Rabbit : MonoBehaviour {
 	void decLife(){
 		if(--mLife <= 0){
 			Rabbit.remove(this.gameObject);
+			if(Gene.phenoEqual(this.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
+				--(Camera.main.gameObject.GetComponent<scriptFarm>().mWinCount);
+			}
 		}
 	}
 }
