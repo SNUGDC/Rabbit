@@ -95,6 +95,8 @@ public class Rabbit : MonoBehaviour {
 		newDummy.transform.Find("Teeth").renderer.material.color = original.mColor;
 		newDummy.transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = original.mSprite[4];
 		newDummy.transform.Find("Leg").renderer.material.color = original.mColor;
+		newDummy.transform.Find("Eye").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Rabbits/ear");
+		newDummy.transform.Find("Eye").renderer.material.color = original.mEyeColor;
 		GameObject newText = (GameObject)Instantiate(scriptFarm.objText, new Vector2(700, 0), Quaternion.identity);
 		newText.GetComponent<TextMesh>().text = "수명 : " + original.life.ToString() + " / " + Rabbit.LIFE_MAX.ToString();
 		dummyList.Add(newDummy);
@@ -133,6 +135,7 @@ public class Rabbit : MonoBehaviour {
 	private int mLife = LIFE_MAX;
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
+	private Color mEyeColor = new Color(1, 1, 1);
 
 	void Start(){
 		mSprite[0] = Resources.Load<Sprite>("Rabbits/ear_none_3");
@@ -145,13 +148,7 @@ public class Rabbit : MonoBehaviour {
 	}
 
 	void Update(){
-		//Vector2 tempPos;
 		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y / 100);
-		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
-		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
-		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
-		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
-		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 	}
 
 	void grow(){
@@ -170,6 +167,8 @@ public class Rabbit : MonoBehaviour {
 		transform.Find("Body").renderer.material.color = mColor;
 		transform.Find("Tail").renderer.material.color = mColor;
 		transform.Find("Leg").renderer.material.color = mColor;
+		mEyeColor = GetComponent<Gene>().list[4].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
+		transform.Find("Eye").renderer.material.color = mEyeColor;
 	}
 
 	void decLife(){
