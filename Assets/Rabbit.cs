@@ -69,7 +69,7 @@ public class Rabbit : MonoBehaviour {
 	}
 
 	public static void create(GameObject father, GameObject mother){
-		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, Vector2.zero, Quaternion.identity);
+		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, new Vector2(Random.Range(-100, 100), Random.Range(-50, 50)), Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
 		Gene motherGene = (mother == null) ? null : mother.GetComponent<Gene>();
@@ -146,16 +146,11 @@ public class Rabbit : MonoBehaviour {
 
 	void Update(){
 		//Vector2 tempPos;
+		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y / 100);
 		transform.Find("Head").GetComponent<SpriteRenderer>().sprite = mSprite[0];
-		//transform.Find("Head").transform.position.z = transform.Find("Head").transform.position.y / 100 - 0.001f;
-		//tempPos.z = tempPos.y / 100 - 0.001f;
-		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Body").GetComponent<SpriteRenderer>().sprite = mSprite[1];
 		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
-		transform.Find("Tail").GetComponent<SpriteRenderer>().sprite = mSprite[2];
 		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
-		transform.Find("Teeth").GetComponent<SpriteRenderer>().sprite = mSprite[3];
-		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 		transform.Find("Leg").GetComponent<SpriteRenderer>().sprite = mSprite[4];
 	}
 

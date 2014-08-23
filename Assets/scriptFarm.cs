@@ -46,6 +46,7 @@ public class scriptFarm : MonoBehaviour {
 		InvokeRepeating("decMoney", 10, 10);
 	}
 	void Update(){
+		roomList.RemoveAll(x => x==null);
 		// for inputs
 		if(Input.GetMouseButtonDown(0)){
 			Vector2 ray = mCurCam.ScreenToWorldPoint(Input.mousePosition);
@@ -303,7 +304,7 @@ public class scriptFarm : MonoBehaviour {
 		if(roomList.Count >= 2){
 			if(GUI.Button(new Rect(Screen.width * 0.9f, Screen.height * 0.6f, Screen.width * 0.1f, Screen.height * 0.1f), "!WOW!")){
 				foreach(GameObject element in roomList){
-					element.transform.position = new Vector2(0, 0);
+					element.transform.position = new Vector2(Random.Range(-100, 100), Random.Range(-50, 50));
 				}
 				Rabbit.create(roomList[1], roomList[0]);
 				checkCondition(Rabbit.rabbitList[Rabbit.rabbitList.Count - 1]);

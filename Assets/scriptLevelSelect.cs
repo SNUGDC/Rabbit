@@ -9,6 +9,7 @@ public class scriptLevelSelect : MonoBehaviour {
 		public string[] script;
 		public bool[] condition;
 		public int count;
+		public string[][][] start;
 		public string[][] target;
 		public string[] targetText;
 	}
@@ -24,7 +25,8 @@ public class scriptLevelSelect : MonoBehaviour {
 	void Start(){
 		JsonGene.init();
 		levelList = new List<LevelData>();
-		System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("LevelData").text);
+		//System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("LevelData").text);
+		System.IO.StreamReader inFile = new System.IO.StreamReader (Application.dataPath + "/LevelData.json");
 		string read = null, json = null;
 		// read each JsonGene from GeneFile
 		while(inFile.Peek() >= 0){
