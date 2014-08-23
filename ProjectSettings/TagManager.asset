@@ -3,8 +3,9 @@
 --- !u!78 &1
 TagManager:
   tags:
-  - rabbit
-  - carrot
+  - Rabbit
+  - Dummy
+  - GUI
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX
@@ -14,9 +15,9 @@ TagManager:
   Builtin Layer 5: UI
   Builtin Layer 6: 
   Builtin Layer 7: 
-  User Layer 8: Carrot
-  User Layer 9: Rabbits
-  User Layer 10: Background
+  User Layer 8: Rabbits
+  User Layer 9: Background
+  User Layer 10: 
   User Layer 11: 
   User Layer 12: 
   User Layer 13: 

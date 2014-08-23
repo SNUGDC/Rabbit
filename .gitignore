@@ -1,3 +1,9 @@
+# ====================== #
+# Sublime Text generated #
+*.sublime-project
+*.sublime-workspace
+# ====================== #
+
 # =============== #
 # Unity generated #
 # =============== #
