@@ -18,9 +18,6 @@ public class scriptLevelSelect : MonoBehaviour {
 	public static List<GeneNode> geneList;
 	public static List<LevelData> levelList;
 
-	private static int mSWidth = Screen.width;
-	private static int mSHeight = Screen.height;
-
 	// Use this for initialization
 	void Start(){
 		JsonGene.init();
@@ -42,41 +39,48 @@ public class scriptLevelSelect : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update(){}
-
-	void OnGUI(){
-		if(GUI.Button (new Rect (mSWidth * 0.075f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "1")) {
-			load(1);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.225f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "2")) {
-			load(2);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.375f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "3")) {
-			load(3);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.525f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "4")) {
-			load(4);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.675f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "5")) {
-			load(5);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.825f, mSHeight * 0.1f, mSWidth * 0.1f, mSHeight * 0.1f), "6")) {
-			load(6);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.075f, mSHeight * 0.3f, mSWidth * 0.1f, mSHeight * 0.1f), "7")) {
-			load(7);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.225f, mSHeight * 0.3f, mSWidth * 0.1f, mSHeight * 0.1f), "8")) {
-			load(8);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.375f, mSHeight * 0.3f, mSWidth * 0.1f, mSHeight * 0.1f), "9")) {
-			load(9);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.525f, mSHeight * 0.3f, mSWidth * 0.1f, mSHeight * 0.1f), "10")) {
-			load(10);
-		}
-		if(GUI.Button (new Rect (mSWidth * 0.4f, mSHeight * 0.85f, mSWidth * 0.2f, mSHeight * 0.05f), "Back")) {
-			Application.LoadLevel("sceneMainMenu");
+	void Update(){
+		if(Input.GetMouseButtonUp(0)){
+			Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
+			GameObject mUpObj = (hit.collider == null) ? null : hit.collider.gameObject;
+			if(mUpObj != null){
+				switch(mUpObj.name){
+					case "LevelBox1" :
+						load(1);
+						break;
+					case "LevelBox2" :
+						load(2);
+						break;
+					case "LevelBox3" :
+						load(3);
+						break;
+					case "LevelBox4" :
+						load(4);
+						break;
+					case "LevelBox5" :
+						load(5);
+						break;
+					case "LevelBox6" :
+						load(6);
+						break;
+					case "LevelBox7" :
+						load(7);
+						break;
+					case "LevelBox8" :
+						load(8);
+						break;
+					case "LevelBox9" :
+						load(9);
+						break;
+					case "LevelBox10" :
+						load(10);
+						break;
+					case "ToCloth" :
+						Application.LoadLevel("sceneCloth");
+						break;
+				}
+			}
 		}
 	}
 

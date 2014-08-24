@@ -11,3 +11,5 @@ EditorBuildSettings:
     path: Assets/sceneFarm.unity
   - enabled: 1
     path: Assets/sceneLevelSelect.unity
+  - enabled: 1
+    path: Assets/sceneCloth.unity

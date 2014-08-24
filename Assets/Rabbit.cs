@@ -41,11 +41,6 @@ public class Rabbit : MonoBehaviour {
 		rabbitList.Add(newRabbit);
 	}
 
-	public static void remove(GameObject input){
-		rabbitList.Remove(input);
-		Destroy(input);
-	}
-
 	public static void createDummy(Rabbit original){
 		GameObject newDummy = (GameObject)Instantiate(scriptFarm.objDummy, new Vector2(700, 0), Quaternion.identity);
 		newDummy.transform.Find("ear_down_2").GetComponent<SpriteRenderer>().sprite = original.head.GetComponent<SpriteRenderer>().sprite;
@@ -111,14 +106,39 @@ public class Rabbit : MonoBehaviour {
 	private bool mIsAdult = false;
 	private Color mColor = new Color(1, 1, 1);
 	private Color mEyeColor = new Color(1, 1, 1);
+	private int mCurAnim;
+	private Vector2 mDir;
 
 	void Start(){
 		Invoke("grow", 2);
 		InvokeRepeating("decLife", 0.01f, 0.01f);
+		mCurAnim = Animator.StringToHash("Base.idle");
 	}
 
 	void Update(){
 		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y / 100);
+		transform.Find("rabbitBody").GetComponent<Animator>().SetInteger("Action", Random.Range(0, 3));
+		if(transform.Find("rabbitBody").GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).nameHash == Animator.StringToHash("Base.walk")){
+			if(mCurAnim != Animator.StringToHash("Base.walk")){
+				mDir = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+				mDir /= 10;
+			}
+			Vector2 tempPos = new Vector2(transform.position.x + mDir.x, transform.position.y + mDir.y);
+			if(scriptFarm.fieldArea.Contains(tempPos)){
+				transform.position = tempPos;
+			}
+		}
+		else if(transform.Find("rabbitBody").GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).nameHash == Animator.StringToHash("Base.jump")){
+			if(mCurAnim != Animator.StringToHash("Base.jump")){
+				mDir = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+				mDir /= 3;
+			}
+			Vector2 tempPos = new Vector2(transform.position.x + mDir.x, transform.position.y + mDir.y);
+			if(scriptFarm.fieldArea.Contains(tempPos)){
+				transform.position = tempPos;
+			}
+		}
+		mCurAnim = transform.Find("rabbitBody").GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).nameHash;
 	}
 
 	void grow(){
@@ -128,8 +148,8 @@ public class Rabbit : MonoBehaviour {
 		int lengthIndex = GetComponent<Gene>().list[6].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1;});
 		int earIndex = GetComponent<Gene>().list[3].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
 		int teethIndex = GetComponent<Gene>().list[5].Phenotype<int>(0, delegate(int arg1, int arg2){return arg1 + arg2;}, delegate(int arg1, int arg2){return arg1 / arg2;});
-		head.renderer.material.color = mColor;
 		head.GetComponent<SpriteRenderer>().sprite = RabbitSprite.manager.headList[earIndex][lengthIndex];
+		head.renderer.material.color = mColor;
 		body.GetComponent<SpriteRenderer>().sprite = RabbitSprite.manager.bodyList[patternIndex][lengthIndex];
 		body.renderer.material.color = mColor;
 		tail.GetComponent<SpriteRenderer>().sprite = RabbitSprite.manager.tailList[lengthIndex];
@@ -145,10 +165,20 @@ public class Rabbit : MonoBehaviour {
 
 	void decLife(){
 		if(--mLife <= 0){
-			Rabbit.remove(this.gameObject);
+			this.remove();
 			if(Gene.phenoEqual(this.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
 				--(Camera.main.gameObject.GetComponent<scriptFarm>().mWinCount);
 			}
 		}
+	}
+
+	public void remove(){
+		rabbitList.Remove(this.gameObject);
+		transform.Find("rabbitBody").GetComponent<Animator>().SetTrigger("Throw");
+		Invoke("removeFinal", 0.63f);
+	}
+
+	public void removeFinal(){
+		Destroy(this.gameObject);
 	}
 }
