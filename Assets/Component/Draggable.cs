@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class Draggable : MonoBehaviour {
-
 	public bool select{
 		get{
 			return mSelect;
@@ -22,7 +21,7 @@ public class Draggable : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(mSelect){
-			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - Vector2.up*10;
 		}
 	}
 }
