@@ -3,8 +3,16 @@ using System.Collections;
 
 public class scriptCloth : MonoBehaviour {
 
+	public static readonly int MAX_INDEX = 2;
+	public static int clothIndex = 0;
+
+	private int mCurIndex;
+
 	// Use this for initialization
-	void Start () {}
+	void Start () {
+		mCurIndex = 0;
+		GameObject.Find("Sister").GetComponent<Animator>().SetInteger("ClothIndex", mCurIndex);
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -15,10 +23,18 @@ public class scriptCloth : MonoBehaviour {
 			if(mUpObj != null){
 				switch(mUpObj.name){
 					case "Left" :
+						mCurIndex = (MAX_INDEX + mCurIndex - 1) % MAX_INDEX;
+						GameObject.Find("Sister").GetComponent<Animator>().SetInteger("ClothIndex", mCurIndex);
 						break;
 					case "Right" :
+						mCurIndex = (mCurIndex + 1) % MAX_INDEX;
+						GameObject.Find("Sister").GetComponent<Animator>().SetInteger("ClothIndex", mCurIndex);
 						break;
 					case "Apply" :
+						clothIndex = mCurIndex;
+						break;
+					case "Return" :
+						Application.LoadLevel("sceneLevelSelect");
 						break;
 				}
 			}
