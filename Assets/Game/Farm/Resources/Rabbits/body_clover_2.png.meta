@@ -1,6 +1,8 @@
 fileFormatVersion: 2
 guid: 7cc8f58f525d89f4eab938ca1c5cf053
 TextureImporter:
+  fileIDToRecycleName:
+    21300000: body_clover_2
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
