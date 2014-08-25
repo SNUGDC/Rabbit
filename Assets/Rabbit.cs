@@ -31,7 +31,7 @@ public class Rabbit : MonoBehaviour {
 		textList = new List<GameObject>();
 	}
 
-	public static void create(GameObject father, GameObject mother){
+	public static void create(GameObject father, GameObject mother, scriptFarm input){
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, new Vector2(Random.Range(-100, 100), Random.Range(-50, 50)), Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
@@ -39,6 +39,9 @@ public class Rabbit : MonoBehaviour {
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit);
+		if(input != null){
+			input.checkCondition(newRabbit);
+		}
 	}
 
 	public static void createDummy(Rabbit original){
@@ -164,15 +167,15 @@ public class Rabbit : MonoBehaviour {
 	}
 
 	void decLife(){
-		if(--mLife <= 0){
+		if(--mLife <= 0 && rabbitList.Contains(this.gameObject)){
 			this.remove();
-			if(Gene.phenoEqual(this.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
-				--(Camera.main.gameObject.GetComponent<scriptFarm>().mWinCount);
-			}
 		}
 	}
 
 	public void remove(){
+		if(Gene.phenoEqual(this.GetComponent<Gene>(), scriptLevelSelect.geneList, scriptLevelSelect.levelList[scriptLevelSelect.level - 1].condition)){
+			--(Camera.main.gameObject.GetComponent<scriptFarm>().mWinCount);
+		}
 		rabbitList.Remove(this.gameObject);
 		transform.Find("rabbitBody").GetComponent<Animator>().SetTrigger("Throw");
 		Invoke("removeFinal", 0.63f);
