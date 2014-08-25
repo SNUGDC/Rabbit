@@ -604,7 +604,8 @@ Prefab:
       propertyPath: m_Name
       value: Sister
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6100000, guid: 03b1c8df19b159d4c9b01d5ecea562e0, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 03b1c8df19b159d4c9b01d5ecea562e0, type: 2}
   m_RootGameObject: {fileID: 794516271}
   m_IsPrefabParent: 0

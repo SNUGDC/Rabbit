@@ -17,6 +17,7 @@ public class scriptLevelSelect : MonoBehaviour {
 	public static int level;
 	public static List<GeneNode> geneList;
 	public static List<LevelData> levelList;
+	public static bool[] clearList = new bool[]{false, false, false, false, false, false, false, false, false, false};
 
 	// Use this for initialization
 	void Start(){
@@ -36,6 +37,14 @@ public class scriptLevelSelect : MonoBehaviour {
 			json = null;
 		}
 		inFile.Close ();
+		for(int i = 1; i <= clearList.Length; ++i){
+			if(clearList[i - 1]){
+				GameObject.Find("LevelBox" + i.ToString()).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("boxWithStar3");
+			}
+			else{
+				GameObject.Find("LevelBox" + i.ToString()).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("box");
+			}
+		}
 	}
 	
 	// Update is called once per frame
