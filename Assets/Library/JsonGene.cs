@@ -102,6 +102,9 @@ public struct JsonGene{
 									case "♣" :
 										arArElement[i] = 3;
 										break;
+									case "O" :
+										arArElement[i] = 4;
+										break;
 								}
 							}
 						}

@@ -21,6 +21,7 @@ public class scriptLevelSelect : MonoBehaviour {
 
 	// Use this for initialization
 	void Start(){
+		//Cursor.SetCursor(Resources.Load<Texture2D>("cursor_click1"), new Vector2(-2, 15), CursorMode.Auto);
 		JsonGene.init();
 		levelList = new List<LevelData>();
 		//System.IO.StringReader inFile = new System.IO.StringReader (Resources.Load<TextAsset> ("LevelData").text);
@@ -49,6 +50,12 @@ public class scriptLevelSelect : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update(){
+		if(Input.GetMouseButton(0)){
+			//Cursor.SetCursor(Resources.Load<Texture2D>("cursor_click2"), new Vector2(-2, 15), CursorMode.Auto);
+		}
+		else{
+			//Cursor.SetCursor(Resources.Load<Texture2D>("cursor_click1"), new Vector2(-2, 15), CursorMode.Auto);
+		}
 		if(Input.GetMouseButtonUp(0)){
 			Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);

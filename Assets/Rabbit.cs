@@ -31,7 +31,7 @@ public class Rabbit : MonoBehaviour {
 		textList = new List<GameObject>();
 	}
 
-	public static void create(GameObject father, GameObject mother, scriptFarm input){
+	public static void create(GameObject father, GameObject mother){
 		GameObject newRabbit = (GameObject)Instantiate(scriptFarm.objRabbit, new Vector2(Random.Range(-100, 100), Random.Range(-50, 50)), Quaternion.identity);
 		// assign genes to newRabbit
 		Gene fatherGene = (father == null) ? null : father.GetComponent<Gene>();
@@ -39,9 +39,6 @@ public class Rabbit : MonoBehaviour {
 		newRabbit.GetComponent<Gene>().create(fatherGene, motherGene);
 		// add newRabbit to rabbitList
 		rabbitList.Add(newRabbit);
-		if(input != null){
-			input.checkCondition(newRabbit);
-		}
 	}
 
 	public static void createDummy(Rabbit original){
@@ -114,7 +111,7 @@ public class Rabbit : MonoBehaviour {
 
 	void Start(){
 		Invoke("grow", 2);
-		InvokeRepeating("decLife", 0.01f, 0.01f);
+		InvokeRepeating("decLife", 0.05f, 0.05f);
 		mCurAnim = Animator.StringToHash("Base.idle");
 	}
 
@@ -164,6 +161,7 @@ public class Rabbit : MonoBehaviour {
 		b2Leg.renderer.material.color = mColor;
 		mEyeColor = GetComponent<Gene>().list[4].Phenotype<Color>(new Color(0, 0, 0), delegate(Color arg1, Color arg2){return arg1 + arg2;}, delegate(Color arg1, int arg2){return arg1 / arg2;});
 		eye.renderer.material.color = mEyeColor;
+		Camera.main.gameObject.GetComponent<scriptFarm>().checkCondition(this.gameObject);
 	}
 
 	void decLife(){
